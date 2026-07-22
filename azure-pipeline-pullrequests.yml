@@ -45,7 +45,7 @@ steps:
     displayName: copy nugets to local-nugets
 
   - bash: |
-      cd Xamarin.RevenueCat.iOS.UsageChecker
+      cd Tonestro.Maui.RevenueCat.iOS.UsageChecker
       dotnet build
     displayName: Build UsageChecker
 

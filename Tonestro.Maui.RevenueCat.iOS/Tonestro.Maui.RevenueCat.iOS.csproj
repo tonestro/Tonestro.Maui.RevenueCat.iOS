@@ -8,7 +8,7 @@
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Tonestro.Maui.RevenueCat.iOS</PackageId>
-        <Version>4.39.0.8</Version>
+        <Version>5.81.1.1</Version>
         <Description>Contains bindings for https://docs.revenuecat.com/docs/ios</Description>
         <Authors>Christian Kapplmüller, Albilaga Linggra Pradana</Authors>
         <Company>fun.music IT GmbH</Company>

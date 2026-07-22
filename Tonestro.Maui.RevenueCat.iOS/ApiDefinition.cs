@@ -77,6 +77,26 @@ interface RCAttribution
     [Export("setCleverTapID:")]
     void SetCleverTapID([NullAllowed] string cleverTapID);
 
+    // -(void)setAirbridgeDeviceID:(NSString * _Nullable)airbridgeDeviceID;
+    [Export("setAirbridgeDeviceID:")]
+    void SetAirbridgeDeviceID([NullAllowed] string airbridgeDeviceID);
+
+    // -(void)setKochavaDeviceID:(NSString * _Nullable)kochavaDeviceID;
+    [Export("setKochavaDeviceID:")]
+    void SetKochavaDeviceID([NullAllowed] string kochavaDeviceID);
+
+    // -(void)setSolarEngineDistinctId:(NSString * _Nullable)solarEngineDistinctId;
+    [Export("setSolarEngineDistinctId:")]
+    void SetSolarEngineDistinctId([NullAllowed] string solarEngineDistinctId);
+
+    // -(void)setSolarEngineAccountId:(NSString * _Nullable)solarEngineAccountId;
+    [Export("setSolarEngineAccountId:")]
+    void SetSolarEngineAccountId([NullAllowed] string solarEngineAccountId);
+
+    // -(void)setSolarEngineVisitorId:(NSString * _Nullable)solarEngineVisitorId;
+    [Export("setSolarEngineVisitorId:")]
+    void SetSolarEngineVisitorId([NullAllowed] string solarEngineVisitorId);
+
     // -(void)setMixpanelDistinctID:(NSString * _Nullable)mixpanelDistinctID;
     [Export("setMixpanelDistinctID:")]
     void SetMixpanelDistinctID([NullAllowed] string mixpanelDistinctID);
@@ -84,6 +104,22 @@ interface RCAttribution
     // -(void)setFirebaseAppInstanceID:(NSString * _Nullable)firebaseAppInstanceID;
     [Export("setFirebaseAppInstanceID:")]
     void SetFirebaseAppInstanceID([NullAllowed] string firebaseAppInstanceID);
+
+    // -(void)setTenjinAnalyticsInstallationID:(NSString * _Nullable)tenjinAnalyticsInstallationID;
+    [Export("setTenjinAnalyticsInstallationID:")]
+    void SetTenjinAnalyticsInstallationID([NullAllowed] string tenjinAnalyticsInstallationID);
+
+    // -(void)setPostHogUserID:(NSString * _Nullable)postHogUserID;
+    [Export("setPostHogUserID:")]
+    void SetPostHogUserID([NullAllowed] string postHogUserID);
+
+    // -(void)setAmplitudeUserID:(NSString * _Nullable)amplitudeUserID;
+    [Export("setAmplitudeUserID:")]
+    void SetAmplitudeUserID([NullAllowed] string amplitudeUserID);
+
+    // -(void)setAmplitudeDeviceID:(NSString * _Nullable)amplitudeDeviceID;
+    [Export("setAmplitudeDeviceID:")]
+    void SetAmplitudeDeviceID([NullAllowed] string amplitudeDeviceID);
 
     // -(void)setMediaSource:(NSString * _Nullable)mediaSource;
     [Export("setMediaSource:")]
@@ -108,6 +144,15 @@ interface RCAttribution
     // -(void)setCreative:(NSString * _Nullable)creative;
     [Export("setCreative:")]
     void SetCreative([NullAllowed] string creative);
+
+    // -(void)setAppsFlyerConversionData:(NSDictionary * _Nullable)data;
+    [Export("setAppsFlyerConversionData:")]
+    void SetAppsFlyerConversionData([NullAllowed] NSDictionary data);
+
+    // -(void)setAppstackAttributionParams:(NSDictionary<NSString *, id> * _Nullable)data completion:(void (^ _Nonnull)(RCOfferings * _Nullable, NSError * _Nullable))completion;
+    [Export("setAppstackAttributionParams:completion:")]
+    void SetAppstackAttributionParams([NullAllowed] NSDictionary<NSString, NSObject> data,
+        Action<RCOfferings, NSError> completion);
 }
 
 // @interface RCConfigurationBuilder : NSObject
@@ -128,9 +173,10 @@ interface RCConfigurationBuilder
     [Export("withAppUserID:")]
     RCConfigurationBuilder WithAppUserID([NullAllowed] string appUserID);
 
-    // -(RCConfigurationBuilder * _Nonnull)withObserverMode:(BOOL)observerMode __attribute__((warn_unused_result("")));
-    [Export("withObserverMode:")]
-    RCConfigurationBuilder WithObserverMode(bool observerMode);
+    // -(RCConfigurationBuilder * _Nonnull)withPurchasesAreCompletedBy:(enum RCPurchasesAreCompletedBy)purchasesAreCompletedBy storeKitVersion:(enum RCStoreKitVersion)storeKitVersion __attribute__((warn_unused_result("")));
+    [Export("withPurchasesAreCompletedBy:storeKitVersion:")]
+    RCConfigurationBuilder WithPurchasesAreCompletedBy(RCPurchasesAreCompletedBy purchasesAreCompletedBy,
+        RCStoreKitVersion storeKitVersion);
 
     // -(RCConfigurationBuilder * _Nonnull)withUserDefaults:(NSUserDefaults * _Nonnull)userDefaults __attribute__((warn_unused_result("")));
     [Export("withUserDefaults:")]
@@ -156,14 +202,36 @@ interface RCConfigurationBuilder
     [Export("withShowStoreMessagesAutomatically:")]
     RCConfigurationBuilder WithShowStoreMessagesAutomatically(bool showStoreMessagesAutomatically);
 
-    // -(RCConfigurationBuilder * _Nonnull)withEntitlementVerificationMode:(enum RCEntitlementVerificationMode)mode __attribute__((warn_unused_result(""))) __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=13.0))) __attribute__((availability(macos, introduced=10.15))) __attribute__((availability(ios, introduced=13.0)));
+    // -(RCConfigurationBuilder * _Nonnull)withEntitlementVerificationMode:(enum RCEntitlementVerificationMode)mode __attribute__((warn_unused_result("")));
     [Export("withEntitlementVerificationMode:")]
     RCConfigurationBuilder WithEntitlementVerificationMode(RCEntitlementVerificationMode mode);
+
+    // -(RCConfigurationBuilder * _Nonnull)withDiagnosticsEnabled:(BOOL)diagnosticsEnabled __attribute__((warn_unused_result(""))) __attribute__((availability(watchos, introduced=8.0))) __attribute__((availability(macos, introduced=12.0))) __attribute__((availability(tvos, introduced=15.0))) __attribute__((availability(ios, introduced=15.0)));
+    [Export("withDiagnosticsEnabled:")]
+    RCConfigurationBuilder WithDiagnosticsEnabled(bool diagnosticsEnabled);
+
+    // -(RCConfigurationBuilder * _Nonnull)withStoreKitVersion:(enum RCStoreKitVersion)version __attribute__((warn_unused_result("")));
+    [Export("withStoreKitVersion:")]
+    RCConfigurationBuilder WithStoreKitVersion(RCStoreKitVersion version);
+
+    // -(RCConfigurationBuilder * _Nonnull)withAutomaticDeviceIdentifierCollectionEnabled:(BOOL)automaticDeviceIdentifierCollectionEnabled __attribute__((warn_unused_result("")));
+    [Export("withAutomaticDeviceIdentifierCollectionEnabled:")]
+    RCConfigurationBuilder WithAutomaticDeviceIdentifierCollectionEnabled(
+        bool automaticDeviceIdentifierCollectionEnabled);
+
+    // -(RCConfigurationBuilder * _Nonnull)withIAMEnabled:(BOOL)iamEnabled __attribute__((warn_unused_result("")));
+    [Export("withIAMEnabled:")]
+    RCConfigurationBuilder WithIAMEnabled(bool iamEnabled);
 
     // -(RCConfiguration * _Nonnull)build __attribute__((warn_unused_result("")));
     [Export("build")]
     RCConfiguration Build();
 
+    // -(RCConfigurationBuilder * _Nonnull)withPreferredUILocaleOverride:(NSString * _Nullable)preferredUILocaleOverride __attribute__((warn_unused_result("")));
+    [Export("withPreferredUILocaleOverride:")]
+    RCConfigurationBuilder WithPreferredUILocaleOverride([NullAllowed] string preferredUILocaleOverride);
+
+    // -(RCConfigurationBuilder * _Nonnull)withUsesStoreKit2IfAvailable:(BOOL)usesStoreKit2IfAvailable __attribute__((warn_unused_result(""))) __attribute__((deprecated("Use .with(storeKitVersion:) to enable StoreKit 2")));
     [Export("withUsesStoreKit2IfAvailable:")]
     RCConfigurationBuilder WithUsesStoreKit2IfAvailable(bool usesStoreKit2IfAvailable);
 }
@@ -229,6 +297,10 @@ interface RCCustomerInfo
     // @property (readonly, copy, nonatomic) NSString * _Nullable originalApplicationVersion;
     [NullAllowed, Export("originalApplicationVersion")]
     string OriginalApplicationVersion { get; }
+
+    // @property (readonly, copy, nonatomic) NSDictionary<NSString *,RCSubscriptionInfo *> * _Nonnull subscriptionsByProductIdentifier;
+    [Export("subscriptionsByProductIdentifier", ArgumentSemantic.Copy)]
+    NSDictionary<NSString, RCSubscriptionInfo> SubscriptionsByProductIdentifier { get; }
 
     // -(NSDate * _Nullable)expirationDateForProductIdentifier:(NSString * _Nonnull)productIdentifier __attribute__((warn_unused_result("")));
     [Export("expirationDateForProductIdentifier:")]
@@ -453,6 +525,113 @@ interface RCNonSubscriptionTransaction
     // @property (readonly, copy, nonatomic) NSString * _Nonnull storeTransactionIdentifier;
     [Export("storeTransactionIdentifier")] string StoreTransactionIdentifier { get; }
 
+    // @property (readonly, nonatomic) enum RCStore store;
+    [Export("store")] RCStore Store { get; }
+
+    // @property (readonly, nonatomic, strong) RCProductPaidPrice * _Nullable price;
+    [NullAllowed, Export("price", ArgumentSemantic.Strong)]
+    RCProductPaidPrice Price { get; }
+
+    // @property (readonly, nonatomic) BOOL isSandbox;
+    [Export("isSandbox")] bool IsSandbox { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull description;
+    [Export("description")] [Override] string Description { get; }
+}
+
+// @interface RCProductPaidPrice : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCProductPaidPrice
+{
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull currency;
+    [Export("currency")] string Currency { get; }
+
+    // @property (readonly, nonatomic) double amount;
+    [Export("amount")] double Amount { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull formatted;
+    [Export("formatted")] string Formatted { get; }
+}
+
+// @interface RCSubscriptionInfo : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCSubscriptionInfo : INativeObject
+{
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull productIdentifier;
+    [Export("productIdentifier")] string ProductIdentifier { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nonnull purchaseDate;
+    [Export("purchaseDate", ArgumentSemantic.Copy)]
+    NSDate PurchaseDate { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable originalPurchaseDate;
+    [NullAllowed, Export("originalPurchaseDate", ArgumentSemantic.Copy)]
+    NSDate OriginalPurchaseDate { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable expiresDate;
+    [NullAllowed, Export("expiresDate", ArgumentSemantic.Copy)]
+    NSDate ExpiresDate { get; }
+
+    // @property (readonly, nonatomic) enum RCStore store;
+    [Export("store")] RCStore Store { get; }
+
+    // @property (readonly, nonatomic) BOOL isSandbox;
+    [Export("isSandbox")] bool IsSandbox { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable unsubscribeDetectedAt;
+    [NullAllowed, Export("unsubscribeDetectedAt", ArgumentSemantic.Copy)]
+    NSDate UnsubscribeDetectedAt { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable billingIssuesDetectedAt;
+    [NullAllowed, Export("billingIssuesDetectedAt", ArgumentSemantic.Copy)]
+    NSDate BillingIssuesDetectedAt { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable gracePeriodExpiresDate;
+    [NullAllowed, Export("gracePeriodExpiresDate", ArgumentSemantic.Copy)]
+    NSDate GracePeriodExpiresDate { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable autoResumeDate;
+    [NullAllowed, Export("autoResumeDate", ArgumentSemantic.Copy)]
+    NSDate AutoResumeDate { get; }
+
+    // @property (readonly, nonatomic) enum RCPurchaseOwnershipType ownershipType;
+    [Export("ownershipType")] RCPurchaseOwnershipType OwnershipType { get; }
+
+    // @property (readonly, nonatomic) enum RCPeriodType periodType;
+    [Export("periodType")] RCPeriodType PeriodType { get; }
+
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable refundedAt;
+    [NullAllowed, Export("refundedAt", ArgumentSemantic.Copy)]
+    NSDate RefundedAt { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable storeTransactionId;
+    [NullAllowed, Export("storeTransactionId")]
+    string StoreTransactionId { get; }
+
+    // @property (readonly, nonatomic) BOOL isActive;
+    [Export("isActive")] bool IsActive { get; }
+
+    // @property (readonly, nonatomic) BOOL willRenew;
+    [Export("willRenew")] bool WillRenew { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable displayName;
+    [NullAllowed, Export("displayName")]
+    string DisplayName { get; }
+
+    // @property (readonly, nonatomic, strong) RCProductPaidPrice * _Nullable price;
+    [NullAllowed, Export("price", ArgumentSemantic.Strong)]
+    RCProductPaidPrice Price { get; }
+
+    // @property (readonly, copy, nonatomic) NSURL * _Nullable managementURL;
+    [NullAllowed, Export("managementURL", ArgumentSemantic.Copy)]
+    NSUrl ManagementURL { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable productPlanIdentifier;
+    [NullAllowed, Export("productPlanIdentifier")]
+    string ProductPlanIdentifier { get; }
+
     // @property (readonly, copy, nonatomic) NSString * _Nonnull description;
     [Export("description")] [Override] string Description { get; }
 }
@@ -504,6 +683,10 @@ interface RCOffering : INativeObject
     [NullAllowed, Export("weekly", ArgumentSemantic.Strong)]
     RCPackage Weekly { get; }
 
+    // @property (readonly, copy, nonatomic) NSURL * _Nullable webCheckoutUrl;
+    [NullAllowed, Export("webCheckoutUrl", ArgumentSemantic.Copy)]
+    NSUrl WebCheckoutUrl { get; }
+
     // @property (readonly, copy, nonatomic) NSString * _Nonnull description;
     [Export("description")] [Override] string Description { get; }
 
@@ -517,10 +700,10 @@ interface RCOffering : INativeObject
     [return: NullAllowed]
     RCPackage ObjectForKeyedSubscript(string key);
 
-    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier serverDescription:(NSString * _Nonnull)serverDescription metadata:(NSDictionary<NSString *,id> * _Nonnull)metadata availablePackages:(NSArray<RCPackage *> * _Nonnull)availablePackages;
-    [Export("initWithIdentifier:serverDescription:metadata:availablePackages:")]
+    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier serverDescription:(NSString * _Nonnull)serverDescription metadata:(NSDictionary<NSString *,id> * _Nonnull)metadata availablePackages:(NSArray<RCPackage *> * _Nonnull)availablePackages webCheckoutUrl:(NSURL * _Nullable)webCheckoutUrl;
+    [Export("initWithIdentifier:serverDescription:metadata:availablePackages:webCheckoutUrl:")]
     IntPtr Constructor(string identifier, string serverDescription, NSDictionary<NSString, NSObject> metadata,
-        RCPackage[] availablePackages);
+        RCPackage[] availablePackages, [NullAllowed] NSUrl webCheckoutUrl);
 }
 
 // @interface RCOfferings : NSObject
@@ -580,16 +763,20 @@ interface RCPackage
     [NullAllowed, Export("localizedIntroductoryPriceString")]
     string LocalizedIntroductoryPriceString { get; }
 
-    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier packageType:(enum RCPackageType)packageType storeProduct:(RCStoreProduct * _Nonnull)storeProduct offeringIdentifier:(NSString * _Nonnull)offeringIdentifier;
-    [Export("initWithIdentifier:packageType:storeProduct:offeringIdentifier:")]
-    IntPtr Constructor(string identifier, RCPackageType packageType, RCStoreProduct storeProduct,
-        string offeringIdentifier);
+    // @property (readonly, copy, nonatomic) NSURL * _Nullable webCheckoutUrl;
+    [NullAllowed, Export("webCheckoutUrl", ArgumentSemantic.Copy)]
+    NSUrl WebCheckoutUrl { get; }
 
-    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier packageType:(enum RCPackageType)packageType storeProduct:(RCStoreProduct * _Nonnull)storeProduct presentedOfferingContext:(RCPresentedOfferingContext * _Nonnull)presentedOfferingContext __attribute__((objc_designated_initializer));
-    [Export("initWithIdentifier:packageType:storeProduct:presentedOfferingContext:")]
+    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier packageType:(enum RCPackageType)packageType storeProduct:(RCStoreProduct * _Nonnull)storeProduct offeringIdentifier:(NSString * _Nonnull)offeringIdentifier webCheckoutUrl:(NSURL * _Nullable)webCheckoutUrl;
+    [Export("initWithIdentifier:packageType:storeProduct:offeringIdentifier:webCheckoutUrl:")]
+    IntPtr Constructor(string identifier, RCPackageType packageType, RCStoreProduct storeProduct,
+        string offeringIdentifier, [NullAllowed] NSUrl webCheckoutUrl);
+
+    // -(instancetype _Nonnull)initWithIdentifier:(NSString * _Nonnull)identifier packageType:(enum RCPackageType)packageType storeProduct:(RCStoreProduct * _Nonnull)storeProduct presentedOfferingContext:(RCPresentedOfferingContext * _Nonnull)presentedOfferingContext webCheckoutUrl:(NSURL * _Nullable)webCheckoutUrl __attribute__((objc_designated_initializer));
+    [Export("initWithIdentifier:packageType:storeProduct:presentedOfferingContext:webCheckoutUrl:")]
     [DesignatedInitializer]
     IntPtr Constructor(string identifier, RCPackageType packageType, RCStoreProduct storeProduct,
-        RCPresentedOfferingContext presentedOfferingContext);
+        RCPresentedOfferingContext presentedOfferingContext, [NullAllowed] NSUrl webCheckoutUrl);
 
     // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
     [Export("isEqual:")]
@@ -724,10 +911,20 @@ interface IRCPurchasesType
     // @required @property (readonly, copy, nonatomic) NSString * _Nonnull appUserID;
     [Abstract] [Export("appUserID")] string AppUserID { get; }
 
+    // @required @property (readonly, copy, nonatomic) NSString * _Nullable storeFrontCountryCode;
+    [Abstract]
+    [NullAllowed, Export("storeFrontCountryCode")]
+    string StoreFrontCountryCode { get; }
+
     // @required @property (readonly, nonatomic) BOOL isAnonymous;
     [Abstract] [Export("isAnonymous")] bool IsAnonymous { get; }
 
-    // @required @property (nonatomic) BOOL finishTransactions;
+    // @required @property (nonatomic) enum RCPurchasesAreCompletedBy purchasesAreCompletedBy;
+    [Abstract]
+    [Export("purchasesAreCompletedBy", ArgumentSemantic.Assign)]
+    RCPurchasesAreCompletedBy PurchasesAreCompletedBy { get; set; }
+
+    // @required @property (nonatomic) BOOL finishTransactions __attribute__((deprecated("Use purchasesAreCompletedBy instead.")));
     [Abstract]
     [Export("finishTransactions")]
     bool FinishTransactions { get; set; }
@@ -740,6 +937,16 @@ interface IRCPurchasesType
     [Abstract]
     [NullAllowed, Export("delegate", ArgumentSemantic.Strong)]
     NSObject WeakDelegate { get; set; }
+
+    // @required -(void)getStorefrontWithCompletion:(void (^ _Nonnull)(RCStorefront * _Nullable))completion;
+    [Abstract]
+    [Export("getStorefrontWithCompletion:")]
+    void GetStorefront(Action<RCStorefront> completion);
+
+    // @required -(void)getStorefrontWithCompletionHandler:(void (^ _Nonnull)(RCStorefront * _Nullable))completionHandler;
+    [Abstract]
+    [Export("getStorefrontWithCompletionHandler:")]
+    void GetStorefrontWithCompletionHandler(Action<RCStorefront> completionHandler);
 
     // @required -(void)logIn:(NSString * _Nonnull)appUserID completion:(void (^ _Nonnull)(RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completion;
     [Abstract]
@@ -835,6 +1042,18 @@ interface IRCPurchasesType
     void PurchaseWithPackage(RCPackage package,
         Action<RCStoreTransaction, RCCustomerInfo, bool, NSError> completionHandler);
 
+    // @required -(void)purchaseWithParams:(RCPurchaseParams * _Nonnull)params completion:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, NSError * _Nullable, BOOL))completion;
+    [Abstract]
+    [Export("purchaseWithParams:completion:")]
+    void PurchaseWithParams(RCPurchaseParams @params,
+        Action<RCStoreTransaction, RCCustomerInfo, NSError, bool> completion);
+
+    // @required -(void)purchase:(RCPurchaseParams * _Nonnull)params completionHandler:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completionHandler;
+    [Abstract]
+    [Export("purchase:completionHandler:")]
+    void Purchase(RCPurchaseParams @params,
+        Action<RCStoreTransaction, RCCustomerInfo, bool, NSError> completionHandler);
+
     // @required -(void)invalidateCustomerInfoCache;
     [Abstract]
     [Export("invalidateCustomerInfoCache")]
@@ -926,6 +1145,18 @@ interface IRCPurchasesType
     void EligiblePromotionalOffersForProduct(RCStoreProduct product,
         Action<NSArray<RCPromotionalOffer>> completionHandler);
 
+    // @required -(void)eligibleWinBackOffersForProduct:(RCStoreProduct * _Nonnull)product completion:(void (^ _Nonnull)(NSArray<RCWinBackOffer *> * _Nullable, NSError * _Nullable))completion __attribute__((availability(visionos, introduced=2.0))) __attribute__((availability(watchos, introduced=11.0))) __attribute__((availability(tvos, introduced=18.0))) __attribute__((availability(macos, introduced=15.0))) __attribute__((availability(ios, introduced=18.0)));
+    [Abstract]
+    [Export("eligibleWinBackOffersForProduct:completion:")]
+    void EligibleWinBackOffersForProduct(RCStoreProduct product,
+        Action<NSArray<RCWinBackOffer>, NSError> completion);
+
+    // @required -(void)eligibleWinBackOffersForPackage:(RCPackage * _Nonnull)package completion:(void (^ _Nonnull)(NSArray<RCWinBackOffer *> * _Nullable, NSError * _Nullable))completion __attribute__((availability(visionos, introduced=2.0))) __attribute__((availability(watchos, introduced=11.0))) __attribute__((availability(tvos, introduced=18.0))) __attribute__((availability(macos, introduced=15.0))) __attribute__((availability(ios, introduced=18.0)));
+    [Abstract]
+    [Export("eligibleWinBackOffersForPackage:completion:")]
+    void EligibleWinBackOffersForPackage(RCPackage package,
+        Action<NSArray<RCWinBackOffer>, NSError> completion);
+
     // @required -(void)beginRefundRequestForProduct:(NSString * _Nonnull)productID completion:(void (^ _Nonnull)(enum RCRefundRequestStatus, NSError * _Nullable))completionHandler __attribute__((availability(tvos, unavailable))) __attribute__((availability(watchos, unavailable))) __attribute__((availability(macos, unavailable))) __attribute__((availability(ios, introduced=15.0)));
     [Abstract]
     [Export("beginRefundRequestForProduct:completion:")]
@@ -972,6 +1203,32 @@ interface IRCPurchasesType
     [Abstract]
     [Export("syncAttributesAndOfferingsIfNeededWithCompletion:")]
     void SyncAttributesAndOfferingsIfNeeded(Action<RCOfferings, NSError> completion);
+
+    // @required -(void)syncAttributesAndOfferingsIfNeededWithCompletionHandler:(void (^ _Nonnull)(RCOfferings * _Nullable, NSError * _Nullable))completionHandler __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=13.0))) __attribute__((availability(macos, introduced=10.15))) __attribute__((availability(ios, introduced=13.0)));
+    [Abstract]
+    [Export("syncAttributesAndOfferingsIfNeededWithCompletionHandler:")]
+    void SyncAttributesAndOfferingsIfNeededWithCompletionHandler(Action<RCOfferings, NSError> completionHandler);
+
+    // @required -(void)redeemWebPurchaseWithWebPurchaseRedemption:(RCWebPurchaseRedemption * _Nonnull)webPurchaseRedemption completion:(void (^ _Nonnull)(RCCustomerInfo * _Nullable, NSError * _Nullable))completion;
+    [Abstract]
+    [Export("redeemWebPurchaseWithWebPurchaseRedemption:completion:")]
+    void RedeemWebPurchase(RCWebPurchaseRedemption webPurchaseRedemption,
+        Action<RCCustomerInfo, NSError> completion);
+
+    // @required -(void)getVirtualCurrenciesWithCompletion:(void (^ _Nonnull)(RCVirtualCurrencies * _Nullable, NSError * _Nullable))completion;
+    [Abstract]
+    [Export("getVirtualCurrenciesWithCompletion:")]
+    void GetVirtualCurrencies(Action<RCVirtualCurrencies, NSError> completion);
+
+    // @required @property (readonly, nonatomic, strong) RCVirtualCurrencies * _Nullable cachedVirtualCurrencies;
+    [Abstract]
+    [NullAllowed, Export("cachedVirtualCurrencies", ArgumentSemantic.Strong)]
+    RCVirtualCurrencies CachedVirtualCurrencies { get; }
+
+    // @required -(void)invalidateVirtualCurrenciesCache;
+    [Abstract]
+    [Export("invalidateVirtualCurrenciesCache")]
+    void InvalidateVirtualCurrenciesCache();
 
     // @required -(void)setAttributes:(NSDictionary<NSString *,NSString *> * _Nonnull)attributes;
     [Abstract]
@@ -1082,6 +1339,12 @@ interface IRCPurchasesType
     [Abstract]
     [Export("collectDeviceIdentifiers")]
     void CollectDeviceIdentifiers();
+
+    // @required -(void)params:(RCPurchaseParams * _Nonnull)params withCompletion:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, NSError * _Nullable, BOOL))completion __attribute__((deprecated("")));
+    [Abstract]
+    [Export("params:withCompletion:")]
+    void Params(RCPurchaseParams @params,
+        Action<RCStoreTransaction, RCCustomerInfo, NSError, bool> completion);
 }
 
 // @interface RCPurchases : NSObject <RCPurchasesType>
@@ -1146,7 +1409,22 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("attribution", ArgumentSemantic.Strong)]
     RCAttribution Attribution { get; }
 
-    // @property (nonatomic) BOOL finishTransactions;
+    // @property (nonatomic) enum RCPurchasesAreCompletedBy purchasesAreCompletedBy;
+    [Export("purchasesAreCompletedBy", ArgumentSemantic.Assign)]
+    RCPurchasesAreCompletedBy PurchasesAreCompletedBy { get; set; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable storeFrontCountryCode;
+    [NullAllowed, Export("storeFrontCountryCode")]
+    string StoreFrontCountryCode { get; }
+
+    // @property (readonly, copy, nonatomic) NSLocale * _Nullable storeFrontLocale __attribute__((availability(watchos, introduced=9.0))) __attribute__((availability(tvos, introduced=16.0))) __attribute__((availability(macos, introduced=13.0))) __attribute__((availability(ios, introduced=16.0)));
+    [NullAllowed, Export("storeFrontLocale", ArgumentSemantic.Copy)]
+    NSLocale StoreFrontLocale { get; }
+
+    // @property (readonly, nonatomic) BOOL isSandbox;
+    [Export("isSandbox")] bool IsSandbox { get; }
+
+    // @property (nonatomic) BOOL finishTransactions __attribute__((deprecated("Use purchasesAreCompletedBy instead.")));
     [Export("finishTransactions")] bool FinishTransactions { get; set; }
 
     // @property (nonatomic, strong, class) RCPlatformInfo * _Nullable platformInfo;
@@ -1200,6 +1478,67 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("syncAttributesAndOfferingsIfNeededWithCompletion:")]
     void SyncAttributesAndOfferingsIfNeeded(Action<RCOfferings, NSError> completion);
 
+    // -(void)syncAttributesAndOfferingsIfNeededWithCompletionHandler:(void (^ _Nonnull)(RCOfferings * _Nullable, NSError * _Nullable))completionHandler __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=13.0))) __attribute__((availability(macos, introduced=10.15))) __attribute__((availability(ios, introduced=13.0)));
+    [Export("syncAttributesAndOfferingsIfNeededWithCompletionHandler:")]
+    void SyncAttributesAndOfferingsIfNeededWithCompletionHandler(Action<RCOfferings, NSError> completionHandler);
+
+    // -(void)getStorefrontWithCompletion:(void (^ _Nonnull)(RCStorefront * _Nullable))completion;
+    [Export("getStorefrontWithCompletion:")]
+    void GetStorefront(Action<RCStorefront> completion);
+
+    // -(void)getStorefrontWithCompletionHandler:(void (^ _Nonnull)(RCStorefront * _Nullable))completionHandler;
+    [Export("getStorefrontWithCompletionHandler:")]
+    void GetStorefrontWithCompletionHandler(Action<RCStorefront> completionHandler);
+
+    // -(void)overridePreferredUILocale:(NSString * _Nullable)locale;
+    [Export("overridePreferredUILocale:")]
+    void OverridePreferredUILocale([NullAllowed] string locale);
+
+    // +(RCWebPurchaseRedemption * _Nullable)parseAsWebPurchaseRedemption:(NSURL * _Nonnull)url __attribute__((warn_unused_result("")));
+    [Static]
+    [Export("parseAsWebPurchaseRedemption:")]
+    [return: NullAllowed]
+    RCWebPurchaseRedemption ParseAsWebPurchaseRedemption(NSUrl url);
+
+    // -(void)redeemWebPurchaseWithWebPurchaseRedemption:(RCWebPurchaseRedemption * _Nonnull)webPurchaseRedemption completion:(void (^ _Nonnull)(RCCustomerInfo * _Nullable, NSError * _Nullable))completion;
+    [Export("redeemWebPurchaseWithWebPurchaseRedemption:completion:")]
+    void RedeemWebPurchase(RCWebPurchaseRedemption webPurchaseRedemption,
+        Action<RCCustomerInfo, NSError> completion);
+
+    // -(void)recordPurchaseForProductID:(NSString * _Nonnull)productID completion:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, NSError * _Nullable))completion __attribute__((availability(watchos, introduced=8.0))) __attribute__((availability(tvos, introduced=15.0))) __attribute__((availability(macos, introduced=12.0))) __attribute__((availability(ios, introduced=15.0)));
+    [Export("recordPurchaseForProductID:completion:")]
+    void RecordPurchaseForProductID(string productID, Action<RCStoreTransaction, NSError> completion);
+
+    // -(void)eligibleWinBackOffersForProduct:(RCStoreProduct * _Nonnull)product completion:(void (^ _Nonnull)(NSArray<RCWinBackOffer *> * _Nullable, NSError * _Nullable))completion __attribute__((availability(visionos, introduced=2.0))) __attribute__((availability(watchos, introduced=11.0))) __attribute__((availability(tvos, introduced=18.0))) __attribute__((availability(macos, introduced=15.0))) __attribute__((availability(ios, introduced=18.0)));
+    [Export("eligibleWinBackOffersForProduct:completion:")]
+    void EligibleWinBackOffersForProduct(RCStoreProduct product,
+        Action<NSArray<RCWinBackOffer>, NSError> completion);
+
+    // -(void)eligibleWinBackOffersForPackage:(RCPackage * _Nonnull)package completion:(void (^ _Nonnull)(NSArray<RCWinBackOffer *> * _Nullable, NSError * _Nullable))completion __attribute__((availability(visionos, introduced=2.0))) __attribute__((availability(watchos, introduced=11.0))) __attribute__((availability(tvos, introduced=18.0))) __attribute__((availability(macos, introduced=15.0))) __attribute__((availability(ios, introduced=18.0)));
+    [Export("eligibleWinBackOffersForPackage:completion:")]
+    void EligibleWinBackOffersForPackage(RCPackage package,
+        Action<NSArray<RCWinBackOffer>, NSError> completion);
+
+    // -(void)getVirtualCurrenciesWithCompletion:(void (^ _Nonnull)(RCVirtualCurrencies * _Nullable, NSError * _Nullable))completion;
+    [Export("getVirtualCurrenciesWithCompletion:")]
+    void GetVirtualCurrencies(Action<RCVirtualCurrencies, NSError> completion);
+
+    // @property (readonly, nonatomic, strong) RCVirtualCurrencies * _Nullable cachedVirtualCurrencies;
+    [NullAllowed, Export("cachedVirtualCurrencies", ArgumentSemantic.Strong)]
+    RCVirtualCurrencies CachedVirtualCurrencies { get; }
+
+    // -(void)invalidateVirtualCurrenciesCache;
+    [Export("invalidateVirtualCurrenciesCache")]
+    void InvalidateVirtualCurrenciesCache();
+
+    // -(void)showStoreMessagesWithCompletion:(void (^ _Nonnull)(void))completion __attribute__((availability(tvos, unavailable))) __attribute__((availability(watchos, unavailable))) __attribute__((availability(macos, unavailable))) __attribute__((availability(ios, introduced=16.0)));
+    [Export("showStoreMessagesWithCompletion:")]
+    void ShowStoreMessages(Action completion);
+
+    // -(void)showStoreMessagesForTypes:(NSSet * _Nonnull)types completion:(void (^ _Nonnull)(void))completion __attribute__((availability(tvos, unavailable))) __attribute__((availability(watchos, unavailable))) __attribute__((availability(macos, unavailable))) __attribute__((availability(ios, introduced=16.0)));
+    [Export("showStoreMessagesForTypes:completion:")]
+    void ShowStoreMessagesForTypes(NSSet types, Action completion);
+
     // +(RCPurchases * _Nonnull)configureWithConfiguration:(RCConfiguration * _Nonnull)configuration;
     [Static]
     [Export("configureWithConfiguration:")]
@@ -1220,10 +1559,11 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("configureWithAPIKey:appUserID:")]
     RCPurchases ConfigureWithAPIKey(string apiKey, [NullAllowed] string appUserID);
 
-    // +(RCPurchases * _Nonnull)configureWithAPIKey:(NSString * _Nonnull)apiKey appUserID:(NSString * _Nullable)appUserID observerMode:(BOOL)observerMode;
+    // +(RCPurchases * _Nonnull)configureWithAPIKey:(NSString * _Nonnull)apiKey appUserID:(NSString * _Nullable)appUserID purchasesAreCompletedBy:(enum RCPurchasesAreCompletedBy)purchasesAreCompletedBy storeKitVersion:(enum RCStoreKitVersion)storeKitVersion;
     [Static]
-    [Export("configureWithAPIKey:appUserID:observerMode:")]
-    RCPurchases ConfigureWithAPIKey(string apiKey, [NullAllowed] string appUserID, bool observerMode);
+    [Export("configureWithAPIKey:appUserID:purchasesAreCompletedBy:storeKitVersion:")]
+    RCPurchases ConfigureWithAPIKey(string apiKey, [NullAllowed] string appUserID,
+        RCPurchasesAreCompletedBy purchasesAreCompletedBy, RCStoreKitVersion storeKitVersion);
 
     // @property (nonatomic, class) BOOL automaticAppleSearchAdsAttributionCollection __attribute__((deprecated("Use Purchases.shared.attribution.enableAdServicesAttributionTokenCollection() instead")));
     [Static]
@@ -1291,9 +1631,19 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("purchasePackage:withCompletion:")]
     void PurchasePackage(RCPackage package, Action<RCStoreTransaction, RCCustomerInfo, NSError, bool> completion);
 
-    // -(void)purchaseWithPackage:(RCPackage * _Nonnull)package completionHandler:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completionHandler __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=13.0))) __attribute__((availability(macos, introduced=10.15))) __attribute__((availability(ios, introduced=13.0)));
+    // -(void)purchaseWithPackage:(RCPackage * _Nonnull)package completionHandler:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completionHandler;
     [Export("purchaseWithPackage:completionHandler:")]
     void PurchaseWithPackage(RCPackage package,
+        Action<RCStoreTransaction, RCCustomerInfo, bool, NSError> completionHandler);
+
+    // -(void)purchaseWithParams:(RCPurchaseParams * _Nonnull)params completion:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, NSError * _Nullable, BOOL))completion;
+    [Export("purchaseWithParams:completion:")]
+    void PurchaseWithParams(RCPurchaseParams @params,
+        Action<RCStoreTransaction, RCCustomerInfo, NSError, bool> completion);
+
+    // -(void)purchase:(RCPurchaseParams * _Nonnull)params completionHandler:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completionHandler;
+    [Export("purchase:completionHandler:")]
+    void Purchase(RCPurchaseParams @params,
         Action<RCStoreTransaction, RCCustomerInfo, bool, NSError> completionHandler);
 
     // -(void)restorePurchasesWithCompletion:(void (^ _Nullable)(RCCustomerInfo * _Nullable, NSError * _Nullable))completion;
@@ -1499,25 +1849,32 @@ interface RCStoreProduct : INativeObject
     // @property (readonly, nonatomic) BOOL isFamilyShareable __attribute__((availability(watchos, introduced=7.0))) __attribute__((availability(tvos, introduced=14.0))) __attribute__((availability(macos, introduced=11.0))) __attribute__((availability(ios, introduced=14.0)));
     [Export("isFamilyShareable")] bool IsFamilyShareable { get; }
 
-    // @property (readonly, copy, nonatomic) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSString * subscriptionGroupIdentifier __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(macos, introduced=10.14))) __attribute__((availability(tvos, introduced=12.0))) __attribute__((availability(maccatalyst, introduced=13.0))) __attribute__((availability(ios, introduced=12.0)));
-    [Export("subscriptionGroupIdentifier")]
+    // @property (readonly, copy, nonatomic) NSString * _Nullable subscriptionGroupIdentifier;
+    [NullAllowed, Export("subscriptionGroupIdentifier")]
     string SubscriptionGroupIdentifier { get; }
 
     // @property (readonly, nonatomic, strong) NSNumberFormatter * _Nullable priceFormatter;
     [NullAllowed, Export("priceFormatter", ArgumentSemantic.Strong)]
     NSNumberFormatter PriceFormatter { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) RCSubscriptionPeriod * subscriptionPeriod __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("subscriptionPeriod", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) RCSubscriptionPeriod * _Nullable subscriptionPeriod;
+    [NullAllowed, Export("subscriptionPeriod", ArgumentSemantic.Strong)]
     RCSubscriptionPeriod SubscriptionPeriod { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) RCStoreProductDiscount * introductoryDiscount __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("introductoryDiscount", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) RCStoreProductDiscount * _Nullable introductoryDiscount;
+    [NullAllowed, Export("introductoryDiscount", ArgumentSemantic.Strong)]
     RCStoreProductDiscount IntroductoryDiscount { get; }
 
-    // @property (readonly, copy, nonatomic) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSArray<RCStoreProductDiscount *> * discounts __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=12.2))) __attribute__((availability(macos, introduced=10.14.4))) __attribute__((availability(ios, introduced=12.2)));
+    // @property (readonly, copy, nonatomic) NSArray<RCStoreProductDiscount *> * _Nonnull discounts;
     [Export("discounts", ArgumentSemantic.Copy)]
     RCStoreProductDiscount[] Discounts { get; }
+
+    // @property (readonly, nonatomic, strong) RCInstallmentsInfo * _Nullable installmentsInfo __attribute__((availability(visionos, introduced=26.4))) __attribute__((availability(macos, introduced=26.4))) __attribute__((availability(watchos, introduced=26.4))) __attribute__((availability(tvos, introduced=26.4))) __attribute__((availability(ios, introduced=26.4)));
+    [NullAllowed, Export("installmentsInfo", ArgumentSemantic.Strong)]
+    RCInstallmentsInfo InstallmentsInfo { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull id;
+    [Export("id")] string Id { get; }
 
     // -(instancetype _Nonnull)initWithSk1Product:(SKProduct * _Nonnull)sk1Product;
     [Export("initWithSk1Product:")]
@@ -1531,30 +1888,37 @@ interface RCStoreProduct : INativeObject
     [Export("price", ArgumentSemantic.Strong)]
     NSDecimalNumber Price { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSDecimalNumber * pricePerWeek __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("pricePerWeek", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerDay __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerDay", ArgumentSemantic.Strong)]
+    NSDecimalNumber PricePerDay { get; }
+
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerWeek __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerWeek", ArgumentSemantic.Strong)]
     NSDecimalNumber PricePerWeek { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSDecimalNumber * pricePerMonth __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("pricePerMonth", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerMonth __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerMonth", ArgumentSemantic.Strong)]
     NSDecimalNumber PricePerMonth { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSDecimalNumber * pricePerYear __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("pricePerYear", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerYear __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerYear", ArgumentSemantic.Strong)]
     NSDecimalNumber PricePerYear { get; }
 
     // @property (readonly, copy, nonatomic) NSString * _Nullable localizedIntroductoryPriceString;
     [NullAllowed, Export("localizedIntroductoryPriceString")]
     string LocalizedIntroductoryPriceString { get; }
 
-    // @property (readonly, copy, nonatomic) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSString * localizedPricePerWeek __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("localizedPricePerWeek")] string LocalizedPricePerWeek { get; }
+    // @property (readonly, copy, nonatomic) NSString * _Nullable localizedPricePerDay __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("localizedPricePerDay")] string LocalizedPricePerDay { get; }
 
-    // @property (readonly, copy, nonatomic) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSString * localizedPricePerMonth __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("localizedPricePerMonth")] string LocalizedPricePerMonth { get; }
+    // @property (readonly, copy, nonatomic) NSString * _Nullable localizedPricePerWeek __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("localizedPricePerWeek")] string LocalizedPricePerWeek { get; }
 
-    // @property (readonly, copy, nonatomic) SWIFT_AVAILABILITY(watchos,introduced=6.2) NSString * localizedPricePerYear __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
-    [Export("localizedPricePerYear")] string LocalizedPricePerYear { get; }
+    // @property (readonly, copy, nonatomic) NSString * _Nullable localizedPricePerMonth __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("localizedPricePerMonth")] string LocalizedPricePerMonth { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable localizedPricePerYear __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("localizedPricePerYear")] string LocalizedPricePerYear { get; }
 }
 
 // @interface RCStoreProductDiscount : NSObject
@@ -1600,9 +1964,25 @@ interface RCStoreProductDiscount
     [Export("price", ArgumentSemantic.Strong)]
     NSDecimalNumber Price { get; }
 
-    // @property (readonly, nonatomic, strong) SWIFT_AVAILABILITY(watchos,introduced=6.2) SKProductDiscount * sk1Discount __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=12.2))) __attribute__((availability(macos, introduced=10.14.4))) __attribute__((availability(ios, introduced=12.2)));
-    [Export("sk1Discount", ArgumentSemantic.Strong)]
+    // @property (readonly, nonatomic, strong) SKProductDiscount * _Nullable sk1Discount;
+    [NullAllowed, Export("sk1Discount", ArgumentSemantic.Strong)]
     SKProductDiscount Sk1Discount { get; }
+
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerDay __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerDay", ArgumentSemantic.Strong)]
+    NSDecimalNumber PricePerDay { get; }
+
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerWeek __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerWeek", ArgumentSemantic.Strong)]
+    NSDecimalNumber PricePerWeek { get; }
+
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerMonth __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerMonth", ArgumentSemantic.Strong)]
+    NSDecimalNumber PricePerMonth { get; }
+
+    // @property (readonly, nonatomic, strong) NSDecimalNumber * _Nullable pricePerYear __attribute__((availability(watchos, introduced=6.2))) __attribute__((availability(tvos, introduced=11.2))) __attribute__((availability(macos, introduced=10.13.2))) __attribute__((availability(ios, introduced=11.2)));
+    [NullAllowed, Export("pricePerYear", ArgumentSemantic.Strong)]
+    NSDecimalNumber PricePerYear { get; }
 }
 
 // @interface RCStoreTransaction : NSObject
@@ -1631,6 +2011,14 @@ interface RCStoreTransaction
     [NullAllowed, Export("jwsRepresentation")]
     string JwsRepresentation { get; }
 
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable revocationDate;
+    [NullAllowed, Export("revocationDate", ArgumentSemantic.Copy)]
+    NSDate RevocationDate { get; }
+
+    // @property (readonly, nonatomic, strong) RCRevocationReason * _Nullable revocationReason;
+    [NullAllowed, Export("revocationReason", ArgumentSemantic.Strong)]
+    RCRevocationReason RevocationReason { get; }
+
     // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
     [Export("isEqual:")]
     [Override]
@@ -1657,6 +2045,10 @@ interface RCStorefront
 
     // @property (readonly, copy, nonatomic) NSString * _Nonnull identifier;
     [Export("identifier")] string Identifier { get; }
+
+    // @property (readonly, copy, nonatomic) NSLocale * _Nonnull locale __attribute__((availability(watchos, introduced=9.0))) __attribute__((availability(tvos, introduced=16.0))) __attribute__((availability(macos, introduced=13.0))) __attribute__((availability(ios, introduced=16.0)));
+    [Export("locale", ArgumentSemantic.Copy)]
+    NSLocale Locale { get; }
 
     // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
     [Export("isEqual:")]
@@ -1702,4 +2094,222 @@ interface RCSubscriptionPeriod
     [Export("debugDescription")]
     [Override]
     string DebugDescription { get; }
+}
+
+// @interface RCPurchaseParams : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCPurchaseParams
+{
+}
+
+// @interface RCPurchaseParamsBuilder : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCPurchaseParamsBuilder
+{
+    // -(instancetype _Nonnull)initWithPackage:(RCPackage * _Nonnull)package __attribute__((objc_designated_initializer));
+    [Export("initWithPackage:")]
+    [DesignatedInitializer]
+    IntPtr Constructor(RCPackage package);
+
+    // -(instancetype _Nonnull)initWithProduct:(RCStoreProduct * _Nonnull)product __attribute__((objc_designated_initializer));
+    [Export("initWithProduct:")]
+    [DesignatedInitializer]
+    IntPtr Constructor(RCStoreProduct product);
+
+    // -(instancetype _Nonnull)withPromotionalOffer:(RCPromotionalOffer * _Nonnull)promotionalOffer __attribute__((warn_unused_result("")));
+    [Export("withPromotionalOffer:")]
+    RCPurchaseParamsBuilder WithPromotionalOffer(RCPromotionalOffer promotionalOffer);
+
+    // -(instancetype _Nonnull)withQuantity:(NSInteger)quantity __attribute__((warn_unused_result("")));
+    [Export("withQuantity:")]
+    RCPurchaseParamsBuilder WithQuantity(nint quantity);
+
+    // -(instancetype _Nonnull)withWinBackOffer:(RCWinBackOffer * _Nonnull)winBackOffer __attribute__((warn_unused_result(""))) __attribute__((availability(visionos, introduced=2.0))) __attribute__((availability(watchos, introduced=11.0))) __attribute__((availability(tvos, introduced=18.0))) __attribute__((availability(macos, introduced=15.0))) __attribute__((availability(ios, introduced=18.0)));
+    [Export("withWinBackOffer:")]
+    RCPurchaseParamsBuilder WithWinBackOffer(RCWinBackOffer winBackOffer);
+
+    // -(instancetype _Nonnull)withIntroductoryOfferEligibilityJWS:(NSString * _Nonnull)introductoryOfferEligibilityJWS __attribute__((warn_unused_result(""))) __attribute__((availability(visionos, introduced=2.4))) __attribute__((availability(watchos, introduced=11.4))) __attribute__((availability(tvos, introduced=18.4))) __attribute__((availability(macos, introduced=15.4))) __attribute__((availability(ios, introduced=15.0)));
+    [Export("withIntroductoryOfferEligibilityJWS:")]
+    RCPurchaseParamsBuilder WithIntroductoryOfferEligibilityJWS(string introductoryOfferEligibilityJWS);
+
+    // -(RCPurchaseParams * _Nonnull)build __attribute__((warn_unused_result("")));
+    [Export("build")]
+    RCPurchaseParams Build();
+}
+
+// @interface RCWinBackOffer : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCWinBackOffer : INativeObject
+{
+    // @property (readonly, nonatomic, strong) RCStoreProductDiscount * _Nonnull discount;
+    [Export("discount", ArgumentSemantic.Strong)]
+    RCStoreProductDiscount Discount { get; }
+}
+
+// @interface RCWebPurchaseRedemption : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCWebPurchaseRedemption
+{
+}
+
+// @interface RCVirtualCurrency : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCVirtualCurrency : INativeObject
+{
+    // @property (readonly, nonatomic) NSInteger balance;
+    [Export("balance")] nint Balance { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull name;
+    [Export("name")] string Name { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull code;
+    [Export("code")] string Code { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable serverDescription;
+    [NullAllowed, Export("serverDescription")]
+    string ServerDescription { get; }
+
+    // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
+    [Export("isEqual:")]
+    [Override]
+    bool IsEqual([NullAllowed] NSObject @object);
+}
+
+// @interface RCVirtualCurrencies : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCVirtualCurrencies
+{
+    // @property (readonly, copy, nonatomic) NSDictionary<NSString *,RCVirtualCurrency *> * _Nonnull all;
+    [Export("all", ArgumentSemantic.Copy)]
+    NSDictionary<NSString, RCVirtualCurrency> All { get; }
+
+    // -(RCVirtualCurrency * _Nullable)objectForKeyedSubscript:(NSString * _Nonnull)key __attribute__((warn_unused_result("")));
+    [Export("objectForKeyedSubscript:")]
+    [return: NullAllowed]
+    RCVirtualCurrency ObjectForKeyedSubscript(string key);
+
+    // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
+    [Export("isEqual:")]
+    [Override]
+    bool IsEqual([NullAllowed] NSObject @object);
+}
+
+// @interface RCRevocationReason : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCRevocationReason
+{
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull rawValue;
+    [Export("rawValue")] string RawValue { get; }
+
+    // -(instancetype _Nonnull)initWithRawValue:(NSString * _Nonnull)rawValue __attribute__((objc_designated_initializer));
+    [Export("initWithRawValue:")]
+    [DesignatedInitializer]
+    IntPtr Constructor(string rawValue);
+
+    // @property (readonly, nonatomic, strong, class) RCRevocationReason * _Nonnull RCDeveloperIssue;
+    [Static]
+    [Export("RCDeveloperIssue", ArgumentSemantic.Strong)]
+    RCRevocationReason DeveloperIssue { get; }
+
+    // @property (readonly, nonatomic, strong, class) RCRevocationReason * _Nonnull RCOther;
+    [Static]
+    [Export("RCOther", ArgumentSemantic.Strong)]
+    RCRevocationReason Other { get; }
+
+    // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
+    [Export("isEqual:")]
+    [Override]
+    bool IsEqual([NullAllowed] NSObject @object);
+
+    // @property (readonly, nonatomic) NSUInteger hash;
+    [Export("hash")] nuint Hash { get; }
+}
+
+// @interface RCBillingPlanType : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCBillingPlanType
+{
+    // @property (readonly, nonatomic, strong, class) RCBillingPlanType * _Nonnull RCUpFront;
+    [Static]
+    [Export("RCUpFront", ArgumentSemantic.Strong)]
+    RCBillingPlanType UpFront { get; }
+
+    // @property (readonly, nonatomic, strong, class) RCBillingPlanType * _Nonnull RCMonthly;
+    [Static]
+    [Export("RCMonthly", ArgumentSemantic.Strong)]
+    RCBillingPlanType Monthly { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull rawValue;
+    [Export("rawValue")] string RawValue { get; }
+
+    // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
+    [Export("isEqual:")]
+    [Override]
+    bool IsEqual([NullAllowed] NSObject @object);
+
+    // @property (readonly, nonatomic) NSUInteger hash;
+    [Export("hash")] nuint Hash { get; }
+}
+
+// @interface RCInstallmentsInfo : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCInstallmentsInfo
+{
+    // @property (readonly, nonatomic) NSInteger commitmentInstallmentsCount;
+    [Export("commitmentInstallmentsCount")]
+    nint CommitmentInstallmentsCount { get; }
+
+    // @property (readonly, nonatomic, strong) RCSubscriptionPeriod * _Nonnull commitmentInstallmentPeriod;
+    [Export("commitmentInstallmentPeriod", ArgumentSemantic.Strong)]
+    RCSubscriptionPeriod CommitmentInstallmentPeriod { get; }
+
+    // @property (readonly, nonatomic) NSDecimal installmentBillingPrice;
+    [Export("installmentBillingPrice")]
+    NSDecimal InstallmentBillingPrice { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull installmentBillingDisplayPrice;
+    [Export("installmentBillingDisplayPrice")]
+    string InstallmentBillingDisplayPrice { get; }
+
+    // @property (readonly, nonatomic, strong) RCSubscriptionPeriod * _Nonnull commitmentTotalPeriod;
+    [Export("commitmentTotalPeriod", ArgumentSemantic.Strong)]
+    RCSubscriptionPeriod CommitmentTotalPeriod { get; }
+
+    // @property (readonly, nonatomic) NSDecimal commitmentTotalPrice;
+    [Export("commitmentTotalPrice")]
+    NSDecimal CommitmentTotalPrice { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nonnull commitmentTotalDisplayPrice;
+    [Export("commitmentTotalDisplayPrice")]
+    string CommitmentTotalDisplayPrice { get; }
+
+    // @property (readonly, nonatomic, strong) RCBillingPlanType * _Nonnull billingPlanType;
+    [Export("billingPlanType", ArgumentSemantic.Strong)]
+    RCBillingPlanType BillingPlanType { get; }
+
+    // -(instancetype _Nonnull)initWithCommitmentInstallmentsCount:(NSInteger)commitmentInstallmentsCount commitmentInstallmentPeriod:(RCSubscriptionPeriod * _Nonnull)commitmentInstallmentPeriod installmentBillingPrice:(NSDecimal)installmentBillingPrice installmentBillingDisplayPrice:(NSString * _Nonnull)installmentBillingDisplayPrice commitmentTotalPeriod:(RCSubscriptionPeriod * _Nonnull)commitmentTotalPeriod commitmentTotalPrice:(NSDecimal)commitmentTotalPrice commitmentTotalDisplayPrice:(NSString * _Nonnull)commitmentTotalDisplayPrice billingPlanType:(RCBillingPlanType * _Nonnull)billingPlanType __attribute__((objc_designated_initializer));
+    [Export(
+        "initWithCommitmentInstallmentsCount:commitmentInstallmentPeriod:installmentBillingPrice:installmentBillingDisplayPrice:commitmentTotalPeriod:commitmentTotalPrice:commitmentTotalDisplayPrice:billingPlanType:")]
+    [DesignatedInitializer]
+    IntPtr Constructor(nint commitmentInstallmentsCount, RCSubscriptionPeriod commitmentInstallmentPeriod,
+        NSDecimal installmentBillingPrice, string installmentBillingDisplayPrice,
+        RCSubscriptionPeriod commitmentTotalPeriod, NSDecimal commitmentTotalPrice,
+        string commitmentTotalDisplayPrice, RCBillingPlanType billingPlanType);
+
+    // -(BOOL)isEqual:(id _Nullable)object __attribute__((warn_unused_result("")));
+    [Export("isEqual:")]
+    [Override]
+    bool IsEqual([NullAllowed] NSObject @object);
+
+    // @property (readonly, nonatomic) NSUInteger hash;
+    [Export("hash")] nuint Hash { get; }
 }
