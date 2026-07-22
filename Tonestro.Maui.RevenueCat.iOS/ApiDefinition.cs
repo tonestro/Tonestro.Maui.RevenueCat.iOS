@@ -230,10 +230,6 @@ interface RCConfigurationBuilder
     // -(RCConfigurationBuilder * _Nonnull)withPreferredUILocaleOverride:(NSString * _Nullable)preferredUILocaleOverride __attribute__((warn_unused_result("")));
     [Export("withPreferredUILocaleOverride:")]
     RCConfigurationBuilder WithPreferredUILocaleOverride([NullAllowed] string preferredUILocaleOverride);
-
-    // -(RCConfigurationBuilder * _Nonnull)withUsesStoreKit2IfAvailable:(BOOL)usesStoreKit2IfAvailable __attribute__((warn_unused_result(""))) __attribute__((deprecated("Use .with(storeKitVersion:) to enable StoreKit 2")));
-    [Export("withUsesStoreKit2IfAvailable:")]
-    RCConfigurationBuilder WithUsesStoreKit2IfAvailable(bool usesStoreKit2IfAvailable);
 }
 
 // @interface NetworkOperation : NSOperation
@@ -336,14 +332,6 @@ interface RCCustomerInfo
     // @property (readonly, copy, nonatomic) NSDictionary<NSString *,id> * _Nonnull rawData;
     [Export("rawData", ArgumentSemantic.Copy)]
     NSDictionary<NSString, NSObject> RawData { get; }
-
-    // @property (readonly, copy, nonatomic) SWIFT_DEPRECATED_MSG("use nonSubscriptionTransactions") NSSet<NSString *> * nonConsumablePurchases __attribute__((deprecated("use nonSubscriptionTransactions")));
-    [Export("nonConsumablePurchases", ArgumentSemantic.Copy)]
-    NSSet<NSString> NonConsumablePurchases { get; }
-
-    // @property (readonly, copy, nonatomic) SWIFT_DEPRECATED_MSG("", "nonSubscriptions") NSArray<RCStoreTransaction *> * nonSubscriptionTransactions __attribute__((deprecated("", "nonSubscriptions")));
-    [Export("nonSubscriptionTransactions", ArgumentSemantic.Copy)]
-    RCStoreTransaction[] NonSubscriptionTransactions { get; }
 }
 
 // @interface RCDangerousSettings : NSObject
@@ -924,11 +912,6 @@ interface IRCPurchasesType
     [Export("purchasesAreCompletedBy", ArgumentSemantic.Assign)]
     RCPurchasesAreCompletedBy PurchasesAreCompletedBy { get; set; }
 
-    // @required @property (nonatomic) BOOL finishTransactions __attribute__((deprecated("Use purchasesAreCompletedBy instead.")));
-    [Abstract]
-    [Export("finishTransactions")]
-    bool FinishTransactions { get; set; }
-
     [Wrap("WeakDelegate"), Abstract]
     [NullAllowed]
     RCPurchasesDelegate Delegate { get; set; }
@@ -1234,117 +1217,6 @@ interface IRCPurchasesType
     [Abstract]
     [Export("setAttributes:")]
     void SetAttributes(NSDictionary<NSString, NSString> attributes);
-
-    // @required @property (nonatomic) BOOL allowSharingAppStoreAccount __attribute__((deprecated("")));
-    [Abstract]
-    [Export("allowSharingAppStoreAccount")]
-    bool AllowSharingAppStoreAccount { get; set; }
-
-    // @required -(void)setEmail:(NSString * _Nullable)email __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setEmail:")]
-    void SetEmail([NullAllowed] string email);
-
-    // @required -(void)setPhoneNumber:(NSString * _Nullable)phoneNumber __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setPhoneNumber:")]
-    void SetPhoneNumber([NullAllowed] string phoneNumber);
-
-    // @required -(void)setDisplayName:(NSString * _Nullable)displayName __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setDisplayName:")]
-    void SetDisplayName([NullAllowed] string displayName);
-
-    // @required -(void)setPushToken:(NSData * _Nullable)pushToken __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setPushToken:")]
-    void SetPushToken([NullAllowed] NSData pushToken);
-
-    // @required -(void)setPushTokenString:(NSString * _Nullable)pushToken __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setPushTokenString:")]
-    void SetPushTokenString([NullAllowed] string pushToken);
-
-    // @required -(void)setAdjustID:(NSString * _Nullable)adjustID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setAdjustID:")]
-    void SetAdjustID([NullAllowed] string adjustID);
-
-    // @required -(void)setAppsflyerID:(NSString * _Nullable)appsflyerID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setAppsflyerID:")]
-    void SetAppsflyerID([NullAllowed] string appsflyerID);
-
-    // @required -(void)setFBAnonymousID:(NSString * _Nullable)fbAnonymousID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setFBAnonymousID:")]
-    void SetFBAnonymousID([NullAllowed] string fbAnonymousID);
-
-    // @required -(void)setMparticleID:(NSString * _Nullable)mparticleID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setMparticleID:")]
-    void SetMparticleID([NullAllowed] string mparticleID);
-
-    // @required -(void)setOnesignalID:(NSString * _Nullable)onesignalID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setOnesignalID:")]
-    void SetOnesignalID([NullAllowed] string onesignalID);
-
-    // @required -(void)setMediaSource:(NSString * _Nullable)mediaSource __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setMediaSource:")]
-    void SetMediaSource([NullAllowed] string mediaSource);
-
-    // @required -(void)setCampaign:(NSString * _Nullable)campaign __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setCampaign:")]
-    void SetCampaign([NullAllowed] string campaign);
-
-    // @required -(void)setAdGroup:(NSString * _Nullable)adGroup __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setAdGroup:")]
-    void SetAdGroup([NullAllowed] string adGroup);
-
-    // @required -(void)setAd:(NSString * _Nullable)value __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setAd:")]
-    void SetAd([NullAllowed] string value);
-
-    // @required -(void)setKeyword:(NSString * _Nullable)keyword __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setKeyword:")]
-    void SetKeyword([NullAllowed] string keyword);
-
-    // @required -(void)setCreative:(NSString * _Nullable)creative __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setCreative:")]
-    void SetCreative([NullAllowed] string creative);
-
-    // @required -(void)setCleverTapID:(NSString * _Nullable)cleverTapID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setCleverTapID:")]
-    void SetCleverTapID([NullAllowed] string cleverTapID);
-
-    // @required -(void)setMixpanelDistinctID:(NSString * _Nullable)mixpanelDistinctID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setMixpanelDistinctID:")]
-    void SetMixpanelDistinctID([NullAllowed] string mixpanelDistinctID);
-
-    // @required -(void)setFirebaseAppInstanceID:(NSString * _Nullable)firebaseAppInstanceID __attribute__((deprecated("")));
-    [Abstract]
-    [Export("setFirebaseAppInstanceID:")]
-    void SetFirebaseAppInstanceID([NullAllowed] string firebaseAppInstanceID);
-
-    // @required -(void)collectDeviceIdentifiers __attribute__((deprecated("")));
-    [Abstract]
-    [Export("collectDeviceIdentifiers")]
-    void CollectDeviceIdentifiers();
-
-    // @required -(void)params:(RCPurchaseParams * _Nonnull)params withCompletion:(void (^ _Nonnull)(RCStoreTransaction * _Nullable, RCCustomerInfo * _Nullable, NSError * _Nullable, BOOL))completion __attribute__((deprecated("")));
-    [Abstract]
-    [Export("params:withCompletion:")]
-    void Params(RCPurchaseParams @params,
-        Action<RCStoreTransaction, RCCustomerInfo, NSError, bool> completion);
 }
 
 // @interface RCPurchases : NSObject <RCPurchasesType>
@@ -1424,9 +1296,6 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     // @property (readonly, nonatomic) BOOL isSandbox;
     [Export("isSandbox")] bool IsSandbox { get; }
 
-    // @property (nonatomic) BOOL finishTransactions __attribute__((deprecated("Use purchasesAreCompletedBy instead.")));
-    [Export("finishTransactions")] bool FinishTransactions { get; set; }
-
     // @property (nonatomic, strong, class) RCPlatformInfo * _Nullable platformInfo;
     [Static]
     [NullAllowed, Export("platformInfo", ArgumentSemantic.Strong)]
@@ -1439,24 +1308,6 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
 
     // @property (readonly, nonatomic) BOOL shouldShowPriceConsent __attribute__((availability(maccatalyst, introduced=13.4))) __attribute__((availability(ios, introduced=13.4)));
     [Export("shouldShowPriceConsent")] bool ShouldShowPriceConsent { get; }
-
-    // @property (nonatomic, class) BOOL debugLogsEnabled __attribute__((deprecated("use Purchases.logLevel instead")));
-    [Static] [Export("debugLogsEnabled")] bool DebugLogsEnabled { get; set; }
-
-    // @property (nonatomic) BOOL allowSharingAppStoreAccount __attribute__((deprecated("Configure behavior through the RevenueCat dashboard instead")));
-    [Export("allowSharingAppStoreAccount")]
-    bool AllowSharingAppStoreAccount { get; set; }
-
-    // +(void)addAttributionData:(NSDictionary<NSString *,id> * _Nonnull)data fromNetwork:(enum RCAttributionNetwork)network __attribute__((deprecated("Use the set<NetworkId> functions instead")));
-    [Static]
-    [Export("addAttributionData:fromNetwork:")]
-    void AddAttributionData(NSDictionary<NSString, NSObject> data, RCAttributionNetwork network);
-
-    // +(void)addAttributionData:(NSDictionary<NSString *,id> * _Nonnull)data fromNetwork:(enum RCAttributionNetwork)network forNetworkUserId:(NSString * _Nullable)networkUserId __attribute__((deprecated("Use the set<NetworkId> functions instead")));
-    [Static]
-    [Export("addAttributionData:fromNetwork:forNetworkUserId:")]
-    void AddAttributionData(NSDictionary<NSString, NSObject> data, RCAttributionNetwork network,
-        [NullAllowed] string networkUserId);
 
     // -(void)logIn:(NSString * _Nonnull)appUserID completion:(void (^ _Nonnull)(RCCustomerInfo * _Nullable, BOOL, NSError * _Nullable))completion;
     [Export("logIn:completion:")]
@@ -1564,11 +1415,6 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("configureWithAPIKey:appUserID:purchasesAreCompletedBy:storeKitVersion:")]
     RCPurchases ConfigureWithAPIKey(string apiKey, [NullAllowed] string appUserID,
         RCPurchasesAreCompletedBy purchasesAreCompletedBy, RCStoreKitVersion storeKitVersion);
-
-    // @property (nonatomic, class) BOOL automaticAppleSearchAdsAttributionCollection __attribute__((deprecated("Use Purchases.shared.attribution.enableAdServicesAttributionTokenCollection() instead")));
-    [Static]
-    [Export("automaticAppleSearchAdsAttributionCollection")]
-    bool AutomaticAppleSearchAdsAttributionCollection { get; set; }
 
     // @property (readonly, copy, nonatomic) NSString * _Nonnull appUserID;
     [Export("appUserID")] string AppUserID { get; }
@@ -1806,10 +1652,6 @@ interface RCPurchasesDiagnostics
     [Static]
     [Export("default_", ArgumentSemantic.Strong)]
     RCPurchasesDiagnostics Default { [Bind("default")] get; }
-
-    // -(void)testSDKHealthWithCompletion:(void (^ _Nonnull)(NSError * _Nullable))completionHandler;
-    [Export("testSDKHealthWithCompletion:")]
-    void TestSDKHealth(Action<NSError> completionHandler);
 }
 
 // @interface RCStoreProduct : NSObject

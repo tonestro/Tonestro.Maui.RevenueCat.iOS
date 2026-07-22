@@ -10,7 +10,7 @@ public class AppDelegate : UIApplicationDelegate
 
     public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
     {
-        RCPurchases.DebugLogsEnabled = true;
+        RCPurchases.LogLevel = RCLogLevel.Debug;
         RCPurchases.ConfigureWithAPIKey("theapikey");
         Console.WriteLine($"Bound RevenueCat iOS SDK Version: {RCPurchases.FrameworkVersion}");
         var userCancelledException = new PurchasesErrorException(new NSError(), true);
