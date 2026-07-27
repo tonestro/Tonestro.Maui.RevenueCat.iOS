@@ -72,6 +72,11 @@ public enum RCPurchasesErrorCode : long
     OfflineConnectionError = 35,
     FeatureNotAvailableInCustomEntitlementsComputationMode = 36,
     SignatureVerificationFailed = 37,
+    FeatureNotSupportedWithStoreKit1 = 38,
+    InvalidWebPurchaseToken = 39,
+    PurchaseBelongsToOtherUser = 40,
+    ExpiredWebPurchaseToken = 41,
+    TestStoreSimulatedPurchaseError = 42,
 }
 
 [Native]
@@ -122,6 +127,7 @@ public enum RCPeriodType : long
     Normal = 0,
     Intro = 1,
     Trial = 2,
+    Prepaid = 3,
 }
 
 [Native]
@@ -150,6 +156,11 @@ public enum RCStore : long
     Promotional = 4,
     UnknownStore = 5,
     Amazon = 6,
+    RCBilling = 7,
+    External = 8,
+    Paddle = 9,
+    TestStore = 10,
+    Galaxy = 11,
 }
 
 [Native]
@@ -158,6 +169,7 @@ public enum RCStoreMessageType : long
     BillingIssue = 0,
     PriceIncreaseConsent = 1,
     Generic = 2,
+    WinBackOffer = 3,
 }
 
 [Native]
@@ -189,6 +201,7 @@ public enum RCDiscountType : long
 {
     Introductory = 0,
     Promotional = 1,
+    WinBack = 2,
 }
 
 [Native]
@@ -198,6 +211,20 @@ public enum RCSubscriptionPeriodUnit : long
     Week = 1,
     Month = 2,
     Year = 3,
+}
+
+[Native]
+public enum RCPurchasesAreCompletedBy : long
+{
+    RevenueCat = 0,
+    MyApp = 1,
+}
+
+[Native]
+public enum RCStoreKitVersion : long
+{
+    StoreKit1 = 1,
+    StoreKit2 = 2,
 }
 
 [Native]

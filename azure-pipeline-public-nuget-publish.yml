@@ -54,9 +54,15 @@ steps:
     displayName: "Copy nugets to nugetoutput folder"
 
   - bash: |
+      set -e
+      # Pushing a .nupkg also auto-pushes the .snupkg next to it; the explicit
+      # snupkg pushes below guarantee symbol publishing and are idempotent
+      # thanks to --skip-duplicate.
       dotnet nuget push nugetoutput/Tonestro.Maui.RevenueCat.iOS.$(bindingsVersion).nupkg -k "$(nugetOrgApiKey)" -s https://api.nuget.org/v3/index.json
       dotnet nuget push nugetoutput/Tonestro.Maui.RevenueCat.iOS.Extensions.$(bindingsVersion).nupkg -k "$(nugetOrgApiKey)" -s https://api.nuget.org/v3/index.json
-    displayName: "Publish nuget packages to nuget.org"
+      dotnet nuget push nugetoutput/Tonestro.Maui.RevenueCat.iOS.$(bindingsVersion).snupkg -k "$(nugetOrgApiKey)" -s https://api.nuget.org/v3/index.json --skip-duplicate
+      dotnet nuget push nugetoutput/Tonestro.Maui.RevenueCat.iOS.Extensions.$(bindingsVersion).snupkg -k "$(nugetOrgApiKey)" -s https://api.nuget.org/v3/index.json --skip-duplicate
+    displayName: "Publish nuget packages and symbols to nuget.org"
 
   - task: GitHubRelease@1
     inputs:
