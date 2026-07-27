@@ -60,8 +60,8 @@ steps:
 
   - task: GitHubRelease@1
     inputs:
-      gitHubConnection: "github.com_thisisthekap"
-      repositoryName: "thisisthekap/Tonestro.Maui.RevenueCat.iOS"
+      gitHubConnection: "tonestro revenuecat ado"
+      repositoryName: "tonestro/Tonestro.Maui.RevenueCat.iOS"
       action: "create"
       target: "$(Build.SourceVersion)"
       tagSource: "userSpecifiedTag"
