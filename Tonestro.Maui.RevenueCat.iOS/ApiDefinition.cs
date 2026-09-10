@@ -97,6 +97,10 @@ interface RCAttribution
     [Export("setSolarEngineVisitorId:")]
     void SetSolarEngineVisitorId([NullAllowed] string solarEngineVisitorId);
 
+    // -(void)setSingularDeviceID:(NSString * _Nullable)singularDeviceID;
+    [Export("setSingularDeviceID:")]
+    void SetSingularDeviceID([NullAllowed] string singularDeviceID);
+
     // -(void)setMixpanelDistinctID:(NSString * _Nullable)mixpanelDistinctID;
     [Export("setMixpanelDistinctID:")]
     void SetMixpanelDistinctID([NullAllowed] string mixpanelDistinctID);
@@ -223,6 +227,10 @@ interface RCConfigurationBuilder
     [Export("withIAMEnabled:")]
     RCConfigurationBuilder WithIAMEnabled(bool iamEnabled);
 
+    // -(RCConfigurationBuilder * _Nonnull)withIAMEnabled:(BOOL)iamEnabled keychainAccessGroup:(NSString * _Nonnull)keychainAccessGroup;
+    [Export("withIAMEnabled:keychainAccessGroup:")]
+    RCConfigurationBuilder WithIAMEnabled(bool iamEnabled, string keychainAccessGroup);
+
     // -(RCConfiguration * _Nonnull)build __attribute__((warn_unused_result("")));
     [Export("build")]
     RCConfiguration Build();
@@ -345,6 +353,10 @@ interface RCDangerousSettings
     [Export("customEntitlementComputation")]
     bool CustomEntitlementComputation { get; }
 
+    // @property (readonly, nonatomic) BOOL forceAllowTestStoreInReleaseBuilds;
+    [Export("forceAllowTestStoreInReleaseBuilds")]
+    bool ForceAllowTestStoreInReleaseBuilds { get; }
+
     // -(instancetype _Nonnull)initWithAutoSyncPurchases:(BOOL)autoSyncPurchases;
     [Export("initWithAutoSyncPurchases:")]
     IntPtr Constructor(bool autoSyncPurchases);
@@ -352,6 +364,11 @@ interface RCDangerousSettings
     // -(instancetype _Nonnull)initWithAutoSyncPurchases:(BOOL)autoSyncPurchases customEntitlementComputation:(BOOL)customEntitlementComputation;
     [Export("initWithAutoSyncPurchases:customEntitlementComputation:")]
     IntPtr Constructor(bool autoSyncPurchases, bool customEntitlementComputation);
+
+    // Exposed through CreateWithTestStore to preserve the existing (bool, bool) constructor.
+    [Internal]
+    [Export("initWithAutoSyncPurchases:forceAllowTestStoreInReleaseBuilds:")]
+    IntPtr InitWithTestStore(bool autoSyncPurchases, bool forceAllowTestStoreInReleaseBuilds);
 }
 
 // @interface RCEntitlementInfo : NSObject
@@ -500,6 +517,14 @@ interface RCIntroEligibility : INativeObject
 [DisableDefaultCtor]
 interface RCNonSubscriptionTransaction
 {
+    // @property (readonly, copy, nonatomic) NSDate * _Nullable originalPurchaseDate;
+    [NullAllowed, Export("originalPurchaseDate", ArgumentSemantic.Copy)]
+    NSDate OriginalPurchaseDate { get; }
+
+    // @property (readonly, copy, nonatomic) NSString * _Nullable displayName;
+    [NullAllowed, Export("displayName")]
+    string DisplayName { get; }
+
     // @property (readonly, copy, nonatomic) NSString * _Nonnull productIdentifier;
     [Export("productIdentifier")] string ProductIdentifier { get; }
 
@@ -1203,6 +1228,12 @@ interface IRCPurchasesType
     [Export("getVirtualCurrenciesWithCompletion:")]
     void GetVirtualCurrencies(Action<RCVirtualCurrencies, NSError> completion);
 
+    // Requires IAM. Amounts are positive, non-zero virtual currency units keyed by currency code.
+    [Abstract]
+    [Export("spendVirtualCurrenciesWithAmounts:reference:completion:")]
+    void SpendVirtualCurrencies(NSDictionary<NSString, NSNumber> amounts, [NullAllowed] string reference,
+        Action<RCVirtualCurrencies, NSError> completion);
+
     // @required @property (readonly, nonatomic, strong) RCVirtualCurrencies * _Nullable cachedVirtualCurrencies;
     [Abstract]
     [NullAllowed, Export("cachedVirtualCurrencies", ArgumentSemantic.Strong)]
@@ -1224,6 +1255,10 @@ interface IRCPurchasesType
 [DisableDefaultCtor]
 interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
 {
+    // @property (readonly, nonatomic, strong) RCPurchasesAuthentication * _Nonnull authentication;
+    [Export("authentication", ArgumentSemantic.Strong)]
+    RCPurchasesAuthentication Authentication { get; }
+
     // @property (readonly, nonatomic, strong, class) RCPurchases * _Nonnull sharedPurchases;
     [Static]
     [Export("sharedPurchases", ArgumentSemantic.Strong)]
@@ -1373,6 +1408,11 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     // -(void)getVirtualCurrenciesWithCompletion:(void (^ _Nonnull)(RCVirtualCurrencies * _Nullable, NSError * _Nullable))completion;
     [Export("getVirtualCurrenciesWithCompletion:")]
     void GetVirtualCurrencies(Action<RCVirtualCurrencies, NSError> completion);
+
+    // Requires IAM. Amounts are positive, non-zero virtual currency units keyed by currency code.
+    [Export("spendVirtualCurrenciesWithAmounts:reference:completion:")]
+    void SpendVirtualCurrencies(NSDictionary<NSString, NSNumber> amounts, [NullAllowed] string reference,
+        Action<RCVirtualCurrencies, NSError> completion);
 
     // @property (readonly, nonatomic, strong) RCVirtualCurrencies * _Nullable cachedVirtualCurrencies;
     [NullAllowed, Export("cachedVirtualCurrencies", ArgumentSemantic.Strong)]
@@ -1596,6 +1636,99 @@ interface RCPurchases : IRCPurchasesType, IPurchasesOrchestratorDelegate
     [Export("beginRefundRequestForActiveEntitlementWithCompletion:")]
     void BeginRefundRequestForActiveEntitlement(
         Action<RCRefundRequestStatus, NSError> completionHandler);
+}
+
+// @interface RCPurchasesAuthentication : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCPurchasesAuthentication
+{
+    // The native delegate is weak; callers must retain their delegate instance.
+    [Wrap("WeakDelegate"), NullAllowed]
+    IRCPurchasesAuthenticationDelegate Delegate { get; set; }
+
+    [NullAllowed, Export("delegate", ArgumentSemantic.Weak)]
+    NSObject WeakDelegate { get; set; }
+
+    [NullAllowed, Export("currentAccessToken")]
+    string CurrentAccessToken { get; }
+
+    [Export("identifyCurrentUserAsID:completion:")]
+    void IdentifyCurrentUser(string appUserID, Action<RCCustomerInfo, bool, NSError> completion);
+
+    [Export("logInUsingToken:completion:")]
+    void LogIn(RCIdentity token, Action<RCCustomerInfo, NSError> completion);
+
+    [Export("logOutWithCompletion:")]
+    void LogOut([NullAllowed] Action<RCCustomerInfo, NSError> completion);
+}
+
+interface IRCPurchasesAuthenticationDelegate
+{
+}
+
+// @protocol RCPurchasesAuthenticationDelegate <NSObject>
+[Protocol, Model]
+[BaseType(typeof(NSObject))]
+interface RCPurchasesAuthenticationDelegate
+{
+    [Abstract]
+    [Export("authenticatorDidEncounterError:")]
+    void DidEncounterError(NSError error);
+
+    [Export("authenticatorDidUpdateAccessToken:")]
+    void DidUpdateAccessToken([NullAllowed] string newAccessToken);
+}
+
+// @interface RCIdentity : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCIdentity
+{
+    [Static]
+    [Export("identityWithSignInWithAppleToken:")]
+    RCIdentity FromSignInWithAppleToken(NSData identityToken);
+
+    [Static]
+    [Export("identityWithOIDCToken:")]
+    RCIdentity FromOIDCToken(NSData identityToken);
+
+    [Static]
+    [Export("identityWithFirebaseToken:")]
+    RCIdentity FromFirebaseToken(NSData identityToken);
+
+    [Export("identitySource", ArgumentSemantic.Strong)]
+    RCIdentitySource IdentitySource { get; }
+}
+
+// @interface RCIdentitySource : NSObject
+[BaseType(typeof(NSObject))]
+[DisableDefaultCtor]
+interface RCIdentitySource
+{
+    [Static, Export("anonymous", ArgumentSemantic.Strong)]
+    RCIdentitySource Anonymous { get; }
+
+    [Static, Export("oidc", ArgumentSemantic.Strong)]
+    RCIdentitySource OIDC { get; }
+
+    [Static, Export("google", ArgumentSemantic.Strong)]
+    RCIdentitySource Google { get; }
+
+    [Static, Export("signInWithApple", ArgumentSemantic.Strong)]
+    RCIdentitySource SignInWithApple { get; }
+
+    [Static, Export("facebook", ArgumentSemantic.Strong)]
+    RCIdentitySource Facebook { get; }
+
+    [Static, Export("firebase", ArgumentSemantic.Strong)]
+    RCIdentitySource Firebase { get; }
+
+    [Export("rawValue")]
+    string RawValue { get; }
+
+    [Export("description"), Override]
+    string Description { get; }
 }
 
 // @interface RCPlatformInfo : NSObject

@@ -21,6 +21,10 @@ import _StringProcessing
 import _SwiftConcurrencyShims
 import os
 import zlib
+@_spi(Internal) public struct CustomVariableKeyValidator {
+  @_spi(Internal) public static func isValidKey(_ key: Swift.String) -> Swift.Bool
+  @_spi(Internal) public static func validateAndFilter<Value>(_ variables: [Swift.String : Value]) -> [Swift.String : Value]
+}
 @_hasMissingDesignatedInitializers @objc(RCOffering) final public class Offering : ObjectiveC.NSObject {
   public struct PaywallComponents {
     @_spi(Internal) public let uiConfig: RevenueCat.UIConfig
@@ -41,7 +45,6 @@ import zlib
   final public var hasPaywall: Swift.Bool {
     get
   }
-  @_spi(Internal) final public let draftPaywallComponents: RevenueCat.Offering.PaywallComponents?
   @objc final public let availablePackages: [RevenueCat.Package]
   @objc final public let lifetime: RevenueCat.Package?
   @objc final public let annual: RevenueCat.Package?
@@ -184,6 +187,7 @@ extension RevenueCat.Offering : Swift.Sendable {
     @_spi(Internal) public var source: RevenueCat.PaywallSource?
     @_spi(Internal) public var workflowId: Swift.String?
     @_spi(Internal) public var stepId: Swift.String?
+    @_spi(Internal) public var traceId: Swift.String?
     @_spi(Internal) @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     public init(offering: RevenueCat.Offering, paywallComponentsData: RevenueCat.PaywallComponentsData, sessionID: RevenueCat.PaywallEvent.SessionID, displayMode: RevenueCat.PaywallViewMode, locale: Foundation.Locale, darkMode: Swift.Bool)
     @_spi(Internal) @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
@@ -361,26 +365,26 @@ extension RevenueCat.Offerings {
 @_spi(Internal) extension RevenueCat.Offerings {
   @_spi(Internal) public static func preview(offerings: [RevenueCat.Offering], currentOfferingID: Swift.String? = nil) -> RevenueCat.Offerings
 }
-@_spi(Experimental) public struct VirtualCurrencyReward : Swift.Sendable, Swift.Equatable {
-  @_spi(Experimental) public let code: Swift.String
-  @_spi(Experimental) public let amount: Swift.Int
-  @_spi(Experimental) public static func == (a: RevenueCat.VirtualCurrencyReward, b: RevenueCat.VirtualCurrencyReward) -> Swift.Bool
+public struct VirtualCurrencyReward : Swift.Sendable, Swift.Equatable {
+  public let code: Swift.String
+  public let amount: Swift.Int
+  public static func == (a: RevenueCat.VirtualCurrencyReward, b: RevenueCat.VirtualCurrencyReward) -> Swift.Bool
 }
-@_spi(Experimental) public struct AdReward : Swift.Sendable, Swift.Equatable {
-  @_spi(Experimental) public static let noReward: RevenueCat.AdReward
-  @_spi(Experimental) public static let unsupportedReward: RevenueCat.AdReward
-  @_spi(Experimental) public var virtualCurrency: RevenueCat.VirtualCurrencyReward? {
-    @_spi(Experimental) get
+public struct AdReward : Swift.Sendable, Swift.Equatable {
+  public static let noReward: RevenueCat.AdReward
+  public static let unsupportedReward: RevenueCat.AdReward
+  public var virtualCurrency: RevenueCat.VirtualCurrencyReward? {
+    get
   }
-  @_spi(Experimental) public var entitlement: RevenueCat.EntitlementReward? {
-    @_spi(Experimental) get
+  public var entitlement: RevenueCat.EntitlementReward? {
+    get
   }
-  @_spi(Experimental) public static func == (a: RevenueCat.AdReward, b: RevenueCat.AdReward) -> Swift.Bool
+  public static func == (a: RevenueCat.AdReward, b: RevenueCat.AdReward) -> Swift.Bool
 }
-@_spi(Experimental) public struct EntitlementReward : Swift.Sendable, Swift.Equatable {
-  @_spi(Experimental) public let identifier: Swift.String
-  @_spi(Experimental) public let expiresAt: Foundation.Date
-  @_spi(Experimental) public static func == (a: RevenueCat.EntitlementReward, b: RevenueCat.EntitlementReward) -> Swift.Bool
+public struct EntitlementReward : Swift.Sendable, Swift.Equatable {
+  public let identifier: Swift.String
+  public let expiresAt: Foundation.Date
+  public static func == (a: RevenueCat.EntitlementReward, b: RevenueCat.EntitlementReward) -> Swift.Bool
 }
 extension RevenueCat.Purchases {
   @available(iOS 15.0, *)
@@ -514,6 +518,7 @@ extension RevenueCat.Attribution {
   @objc final public func setSolarEngineDistinctId(_ solarEngineDistinctId: Swift.String?)
   @objc final public func setSolarEngineAccountId(_ solarEngineAccountId: Swift.String?)
   @objc final public func setSolarEngineVisitorId(_ solarEngineVisitorId: Swift.String?)
+  @objc final public func setSingularDeviceID(_ singularDeviceID: Swift.String?)
   @objc final public func setMixpanelDistinctID(_ mixpanelDistinctID: Swift.String?)
   @objc final public func setFirebaseAppInstanceID(_ firebaseAppInstanceID: Swift.String?)
   @objc final public func setTenjinAnalyticsInstallationID(_ tenjinAnalyticsInstallationID: Swift.String?)
@@ -1040,6 +1045,9 @@ extension RevenueCat.PromotionalOffer : Swift.Sendable {
 }
 extension RevenueCat.PromotionalOffer.SignedData : Swift.Sendable {
 }
+@_spi(Internal) extension RevenueCat.PaywallEvent {
+  @_spi(Internal) public func paywallMap() -> [Swift.String : Any]
+}
 public struct PaywallData {
   public var id: Swift.String?
   public var templateName: Swift.String
@@ -1383,11 +1391,13 @@ extension RevenueCat.PurchasesDiagnostics.Error : Foundation.CustomNSError {
 @_hasMissingDesignatedInitializers @objc(RCNonSubscriptionTransaction) final public class NonSubscriptionTransaction : ObjectiveC.NSObject {
   @objc final public let productIdentifier: Swift.String
   @objc final public let purchaseDate: Foundation.Date
+  @objc final public let originalPurchaseDate: Foundation.Date?
   @objc final public let transactionIdentifier: Swift.String
   @objc final public let storeTransactionIdentifier: Swift.String
   @objc final public let store: RevenueCat.Store
   @objc final public let price: RevenueCat.ProductPaidPrice?
   @objc final public let isSandbox: Swift.Bool
+  @objc final public let displayName: Swift.String?
   @objc override final public var description: Swift.String {
     @objc get
   }
@@ -1848,16 +1858,20 @@ extension RevenueCat.Purchases {
   @_spi(Internal) final public var uiPreviewMode: Swift.Bool {
     @_spi(Internal) get
   }
-  @_spi(Internal) final public var useWorkflows: Swift.Bool {
-    @_spi(Internal) get
-  }
   @objc final public var customEntitlementComputation: Swift.Bool {
     @objc get
   }
+  @objc final public var forceAllowTestStoreInReleaseBuilds: Swift.Bool {
+    @objc get
+  }
+  @_spi(Experimental) final public var useExternalPurchaseCustomLinks: Swift.Bool {
+    @_spi(Experimental) get
+  }
   @objc override convenience dynamic public init()
   @objc convenience public init(autoSyncPurchases: Swift.Bool = true)
+  @objc convenience public init(autoSyncPurchases: Swift.Bool, forceAllowTestStoreInReleaseBuilds: Swift.Bool)
+  @_spi(Experimental) convenience public init(autoSyncPurchases: Swift.Bool, useExternalPurchaseCustomLinks: Swift.Bool)
   @_spi(Internal) convenience public init(uiPreviewMode: Swift.Bool)
-  @_spi(Internal) convenience public init(useWorkflows: Swift.Bool)
   @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
   @objc override final public var hash: Swift.Int {
     @objc get
@@ -2301,6 +2315,16 @@ extension RevenueCat.PackageType {
 }
 extension RevenueCat.SubscriptionInfo : Swift.Sendable {
 }
+@_spi(Internal) public struct URLWithValidation : Swift.Hashable, Swift.Sendable {
+  @_spi(Internal) public let url: Foundation.URL
+  @_spi(Internal) public let checksum: RevenueCat.Checksum?
+  @_spi(Internal) public init(url: Foundation.URL, checksum: RevenueCat.Checksum?)
+  @_spi(Internal) public static func == (a: RevenueCat.URLWithValidation, b: RevenueCat.URLWithValidation) -> Swift.Bool
+  @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) public var hashValue: Swift.Int {
+    @_spi(Internal) get
+  }
+}
 public enum WebPurchaseRedemptionResult : Swift.Sendable {
   case success(_: RevenueCat.CustomerInfo)
   case error(_: RevenueCat.PublicError)
@@ -2431,8 +2455,9 @@ extension RevenueCat.StoreTransaction : Swift.Identifiable {
     @_spi(Internal) final public let stack: RevenueCat.PaywallComponent.StackComponent
     @_spi(Internal) final public let name: Swift.String?
     @_spi(Internal) final public let id: Swift.String?
+    @_spi(Internal) final public let hapticFeedbackEnabled: Swift.Bool?
     @_spi(Internal) final public let overrides: RevenueCat.PaywallComponent.ComponentOverrides<RevenueCat.PaywallComponent.PartialPackageComponent>?
-    @_spi(Internal) public init(packageID: Swift.String, isSelectedByDefault: Swift.Bool, visible: Swift.Bool? = nil, applePromoOfferProductCode: Swift.String?, stack: RevenueCat.PaywallComponent.StackComponent, name: Swift.String? = nil, id: Swift.String? = nil, overrides: RevenueCat.PaywallComponent.ComponentOverrides<RevenueCat.PaywallComponent.PartialPackageComponent>? = nil)
+    @_spi(Internal) public init(packageID: Swift.String, isSelectedByDefault: Swift.Bool, visible: Swift.Bool? = nil, applePromoOfferProductCode: Swift.String?, stack: RevenueCat.PaywallComponent.StackComponent, name: Swift.String? = nil, id: Swift.String? = nil, hapticFeedbackEnabled: Swift.Bool? = nil, overrides: RevenueCat.PaywallComponent.ComponentOverrides<RevenueCat.PaywallComponent.PartialPackageComponent>? = nil)
     @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
     @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.PackageComponent, rhs: RevenueCat.PaywallComponent.PackageComponent) -> Swift.Bool
     @_spi(Internal) @objc deinit
@@ -2459,6 +2484,13 @@ public protocol RawDataContainer {
   associatedtype Content
   var rawData: Self.Content { get }
 }
+@_spi(Internal) public struct ConfiguredStoreEnvironment : Swift.Sendable {
+  @_spi(Internal) public init(apiKey: Swift.String, storeFrontCountryCode: @autoclosure @escaping @Sendable () -> Swift.String?)
+  @_spi(Internal) public var storeFrontCountryCode: Swift.String? {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public func entitlementProviderName() -> Swift.String
+}
 public typealias PurchaseResultData = (transaction: RevenueCat.StoreTransaction?, customerInfo: RevenueCat.CustomerInfo, userCancelled: Swift.Bool)
 public typealias PurchaseCompletedBlock = @_Concurrency.MainActor @Sendable (RevenueCat.StoreTransaction?, RevenueCat.CustomerInfo?, RevenueCat.PublicError?, Swift.Bool) -> Swift.Void
 public typealias GetStorefrontBlock = @_Concurrency.MainActor @Sendable (RevenueCat.Storefront?) -> Swift.Void
@@ -2478,6 +2510,7 @@ public typealias StartPurchaseBlock = (@escaping RevenueCat.PurchaseCompletedBlo
     @_spi(Internal) get
     @_spi(Internal) set
   }
+  @_spi(Internal) final public func getOrCreateCheckpointsManager<Manager>(_ create: () -> Manager) -> Manager where Manager : AnyObject
   @objc public static var logLevel: RevenueCat.LogLevel {
     @objc get
     @objc set
@@ -2523,11 +2556,12 @@ public typealias StartPurchaseBlock = (@escaping RevenueCat.PurchaseCompletedBlo
   @objc final public var storeFrontLocale: Foundation.Locale? {
     @_spi(Experimental) @objc get
   }
-  @_spi(Experimental) @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
-  @objc final public var adTracker: RevenueCat.AdTracker {
-    @_spi(Experimental) @objc get
+  @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
+  final public var adTracker: RevenueCat.AdTracker {
+    get
   }
   @_spi(Internal) final public let subscriptionHistoryTracker: RevenueCat.SubscriptionHistoryTracker
+  @_spi(Internal) final public let configuredStoreEnvironment: RevenueCat.ConfiguredStoreEnvironment
   @objc deinit
 }
 extension RevenueCat.Purchases {
@@ -2548,11 +2582,16 @@ extension RevenueCat.Purchases {
   }
   @_spi(Internal) final public func workflow(forOfferingIdentifier offeringID: Swift.String) async throws -> RevenueCat.WorkflowDataResult
   @_spi(Internal) final public func cachedWorkflow(forOfferingIdentifier offeringID: Swift.String) -> RevenueCat.WorkflowDataResult?
+  @_spi(Internal) final public func resolveCheckpoint(identifier: Swift.String, params: RevenueCat.CheckpointParams) async throws -> RevenueCat.CheckpointResolution
 }
 extension RevenueCat.Purchases {
+  @_spi(Internal) @objc final public var authentication: RevenueCat.Authentication {
+    @_spi(Internal) @objc get
+  }
   @available(*, deprecated, message: "The appUserID passed to logIn is a constant string known at compile time.\nThis is likely a programmer error. This ID is used to identify the current user.\nSee https://docs.revenuecat.com/docs/user-ids for more information.")
   final public func logIn(_ appUserID: Swift.StaticString, completion: @escaping (RevenueCat.CustomerInfo?, Swift.Bool, RevenueCat.PublicError?) -> Swift.Void)
   @_disfavoredOverload @objc(logIn:completion:) final public func logIn(_ appUserID: Swift.String, completion: @escaping (RevenueCat.CustomerInfo?, Swift.Bool, RevenueCat.PublicError?) -> Swift.Void)
+  @available(*, deprecated, message: "The appUserID passed to logIn is a constant string known at compile time.\nThis is likely a programmer error. This ID is used to identify the current user.\nSee https://docs.revenuecat.com/docs/user-ids for more information.")
   final public func logIn(_ appUserID: Swift.StaticString) async throws -> (customerInfo: RevenueCat.CustomerInfo, created: Swift.Bool)
   @_disfavoredOverload @objc final public func logIn(_ appUserID: Swift.String) async throws -> (customerInfo: RevenueCat.CustomerInfo, created: Swift.Bool)
   @objc final public func logOut(completion: ((RevenueCat.CustomerInfo?, RevenueCat.PublicError?) -> Swift.Void)?)
@@ -2649,6 +2688,9 @@ extension RevenueCat.Purchases {
   }
   final public func virtualCurrencies() async throws -> RevenueCat.VirtualCurrencies
   @objc final public func invalidateVirtualCurrenciesCache()
+  @_spi(Internal) final public func spendVirtualCurrencies(amounts: [Swift.String : Swift.Int], reference: Swift.String? = nil) async throws -> RevenueCat.VirtualCurrencies
+  @_spi(Internal) final public func spendVirtualCurrency(code: Swift.String, amount: Swift.Int, reference: Swift.String? = nil) async throws -> RevenueCat.VirtualCurrencies
+  @_spi(Internal) @objc final public func spendVirtualCurrencies(amounts: [Swift.String : Swift.Int], reference: Swift.String?, completion: @escaping (RevenueCat.VirtualCurrencies?, RevenueCat.PublicError?) -> Swift.Void)
 }
 @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
 extension RevenueCat.Purchases {
@@ -2658,12 +2700,19 @@ extension RevenueCat.Purchases {
   @_spi(Internal) final public func loadCustomerCenter() async throws -> RevenueCat.CustomerCenterConfigData
   @_spi(Internal) final public func createTicket(customerEmail: Swift.String, ticketDescription: Swift.String) async throws -> Swift.Bool
   @_spi(Internal) final public func failedToLoadFontWithConfig(_ fontConfig: RevenueCat.UIConfig.FontsConfig)
+  @_spi(Internal) final public func prepareExternalPurchaseLink() async -> RevenueCat.ExternalPurchaseLinkResult
+  @_spi(Internal) final public var useExternalPurchaseCustomLinks: Swift.Bool {
+    @_spi(Internal) get
+  }
   @available(iOS 15.0, macOS 12.0, watchOS 8.0, tvOS 15.0, *)
   public static let paywallImageDownloadSession: Foundation.URLSession
 }
 extension RevenueCat.Purchases {
-  @_spi(Experimental) final public func generateRewardVerificationToken(impressionId: Swift.String) -> RevenueCat.RewardVerificationToken
-  @_spi(Experimental) final public func pollRewardVerification(clientTransactionID: Swift.String) async -> RevenueCat.RewardVerificationResult
+  @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
+  final public func generateRewardVerificationToken(impressionId: Swift.String) -> RevenueCat.RewardVerificationToken
+  @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
+  final public func pollRewardVerification(clientTransactionID: Swift.String, trackingMetadata: RevenueCat.RewardedAdTrackingMetadata? = nil) async -> RevenueCat.RewardVerificationResult
+  @_spi(Internal) final public func pollRewardVerification(clientTransactionID: Swift.String, trackingMetadata: RevenueCat.RewardedAdTrackingMetadata?, captureMethod: RevenueCat.AdEventCaptureMethod) async -> RevenueCat.RewardVerificationResult
 }
 extension RevenueCat.Purchases {
   @objc final public func overridePreferredUILocale(_ locale: Swift.String?)
@@ -2886,217 +2935,154 @@ extension RevenueCat.PaywallData {
     @_spi(Internal) get
   }
 }
-@_spi(Experimental) @objc(RCMediatorName) final public class MediatorName : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public let rawValue: Swift.String
-  @_spi(Experimental) @objc public init(rawValue: Swift.String)
-  @_spi(Experimental) @objc public static let adMob: RevenueCat.MediatorName
-  @_spi(Experimental) @objc public static let appLovin: RevenueCat.MediatorName
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
+@objc final public class MediatorName : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let rawValue: Swift.String
+  public init(rawValue: Swift.String)
+  public static let adMob: RevenueCat.MediatorName
+  public static let appLovin: RevenueCat.MediatorName
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdFormat) final public class AdFormat : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public let rawValue: Swift.String
-  @_spi(Experimental) @objc public init(rawValue: Swift.String)
-  @_spi(Experimental) @objc public static let other: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let banner: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let interstitial: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let rewarded: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let rewardedInterstitial: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let native: RevenueCat.AdFormat
-  @_spi(Experimental) @objc public static let appOpen: RevenueCat.AdFormat
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
+@objc final public class AdFormat : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let rawValue: Swift.String
+  public init(rawValue: Swift.String)
+  public static let other: RevenueCat.AdFormat
+  public static let banner: RevenueCat.AdFormat
+  public static let interstitial: RevenueCat.AdFormat
+  public static let rewarded: RevenueCat.AdFormat
+  public static let rewardedInterstitial: RevenueCat.AdFormat
+  public static let native: RevenueCat.AdFormat
+  public static let appOpen: RevenueCat.AdFormat
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdFailedToLoad) final public class AdFailedToLoad : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public var mediatorName: RevenueCat.MediatorName {
-    get
+@objc final public class AdFailedToLoad : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let mediatorName: RevenueCat.MediatorName
+  final public let adFormat: RevenueCat.AdFormat
+  final public let placement: Swift.String?
+  final public let adUnitId: Swift.String
+  final public let mediatorErrorCode: Swift.Int?
+  public init(mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String? = nil, adUnitId: Swift.String, mediatorErrorCode: Swift.Int?)
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc final public var adFormat: RevenueCat.AdFormat {
-    get
-  }
-  @_spi(Experimental) @objc final public var placement: Swift.String? {
-    get
-  }
-  @_spi(Experimental) @objc final public var adUnitId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var mediatorErrorCode: Foundation.NSNumber? {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) final public var mediatorErrorCodeValue: Swift.Int? {
-    @_spi(Experimental) get
-  }
-  @_spi(Experimental) @objc public init(mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, mediatorErrorCode: Foundation.NSNumber?)
-  @_spi(Experimental) convenience public init(mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, mediatorErrorCode: Swift.Int?)
-  @_spi(Experimental) @objc convenience public init(mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, mediatorErrorCode: Foundation.NSNumber? = nil)
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdLoaded) final public class AdLoaded : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public var networkName: Swift.String? {
-    get
+@objc final public class AdLoaded : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let networkName: Swift.String?
+  final public let mediatorName: RevenueCat.MediatorName
+  final public let adFormat: RevenueCat.AdFormat
+  final public let placement: Swift.String?
+  final public let adUnitId: Swift.String
+  final public let impressionId: Swift.String
+  public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
+  convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc final public var mediatorName: RevenueCat.MediatorName {
-    get
-  }
-  @_spi(Experimental) @objc final public var adFormat: RevenueCat.AdFormat {
-    get
-  }
-  @_spi(Experimental) @objc final public var placement: Swift.String? {
-    get
-  }
-  @_spi(Experimental) @objc final public var adUnitId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var impressionId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdDisplayed) final public class AdDisplayed : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public var networkName: Swift.String? {
-    get
+@objc final public class AdDisplayed : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let networkName: Swift.String?
+  final public let mediatorName: RevenueCat.MediatorName
+  final public let adFormat: RevenueCat.AdFormat
+  final public let placement: Swift.String?
+  final public let adUnitId: Swift.String
+  final public let impressionId: Swift.String
+  public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
+  convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc final public var mediatorName: RevenueCat.MediatorName {
-    get
-  }
-  @_spi(Experimental) @objc final public var adFormat: RevenueCat.AdFormat {
-    get
-  }
-  @_spi(Experimental) @objc final public var placement: Swift.String? {
-    get
-  }
-  @_spi(Experimental) @objc final public var adUnitId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var impressionId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdOpened) final public class AdOpened : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public var networkName: Swift.String? {
-    get
+@objc final public class AdOpened : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let networkName: Swift.String?
+  final public let mediatorName: RevenueCat.MediatorName
+  final public let adFormat: RevenueCat.AdFormat
+  final public let placement: Swift.String?
+  final public let adUnitId: Swift.String
+  final public let impressionId: Swift.String
+  public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
+  convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc final public var mediatorName: RevenueCat.MediatorName {
-    get
-  }
-  @_spi(Experimental) @objc final public var adFormat: RevenueCat.AdFormat {
-    get
-  }
-  @_spi(Experimental) @objc final public var placement: Swift.String? {
-    get
-  }
-  @_spi(Experimental) @objc final public var adUnitId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var impressionId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String)
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) @objc(RCAdRevenue) final public class AdRevenue : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
-  @_spi(Experimental) @objc final public var networkName: Swift.String? {
-    get
+@objc final public class AdRevenue : ObjectiveC.NSObject, Swift.Codable, @unchecked Swift.Sendable {
+  final public let networkName: Swift.String?
+  final public let mediatorName: RevenueCat.MediatorName
+  final public let adFormat: RevenueCat.AdFormat
+  final public let placement: Swift.String?
+  final public let adUnitId: Swift.String
+  final public let impressionId: Swift.String
+  final public let revenueMicros: Swift.Int
+  final public let currency: Swift.String
+  final public let precision: RevenueCat.AdRevenue.Precision
+  public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String, revenueMicros: Swift.Int, currency: Swift.String, precision: RevenueCat.AdRevenue.Precision)
+  convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String, revenueMicros: Swift.Int, currency: Swift.String, precision: RevenueCat.AdRevenue.Precision)
+  @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  @objc override final public var hash: Swift.Int {
+    @objc get
   }
-  @_spi(Experimental) @objc final public var mediatorName: RevenueCat.MediatorName {
-    get
-  }
-  @_spi(Experimental) @objc final public var adFormat: RevenueCat.AdFormat {
-    get
-  }
-  @_spi(Experimental) @objc final public var placement: Swift.String? {
-    get
-  }
-  @_spi(Experimental) @objc final public var adUnitId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var impressionId: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var revenueMicros: Swift.Int {
-    get
-  }
-  @_spi(Experimental) @objc final public var currency: Swift.String {
-    get
-  }
-  @_spi(Experimental) @objc final public var precision: RevenueCat.AdRevenue.Precision {
-    get
-  }
-  @_spi(Experimental) @objc public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String, revenueMicros: Swift.Int, currency: Swift.String, precision: RevenueCat.AdRevenue.Precision)
-  @_spi(Experimental) @objc convenience public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, adUnitId: Swift.String, impressionId: Swift.String, revenueMicros: Swift.Int, currency: Swift.String, precision: RevenueCat.AdRevenue.Precision)
-  @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-  @_spi(Experimental) @objc override final public var hash: Swift.Int {
-    @_spi(Experimental) @objc get
-  }
-  @_spi(Experimental) @objc deinit
-  @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-  @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+  @objc deinit
+  final public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Experimental) extension RevenueCat.AdRevenue {
-  @_spi(Experimental) @objc(RCAdRevenuePrecision) final public class Precision : ObjectiveC.NSObject, Swift.Codable {
-    @_spi(Experimental) @objc final public let rawValue: Swift.String
-    @_spi(Experimental) @objc public init(rawValue: Swift.String)
-    @_spi(Experimental) @objc public static let exact: RevenueCat.AdRevenue.Precision
-    @_spi(Experimental) @objc public static let publisherDefined: RevenueCat.AdRevenue.Precision
-    @_spi(Experimental) @objc public static let estimated: RevenueCat.AdRevenue.Precision
-    @_spi(Experimental) @objc public static let unknown: RevenueCat.AdRevenue.Precision
-    @_spi(Experimental) @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
-    @_spi(Experimental) @objc override final public var hash: Swift.Int {
-      @_spi(Experimental) @objc get
+extension RevenueCat.AdRevenue {
+  @objc final public class Precision : ObjectiveC.NSObject, Swift.Codable {
+    final public let rawValue: Swift.String
+    public init(rawValue: Swift.String)
+    public static let exact: RevenueCat.AdRevenue.Precision
+    public static let publisherDefined: RevenueCat.AdRevenue.Precision
+    public static let estimated: RevenueCat.AdRevenue.Precision
+    public static let unknown: RevenueCat.AdRevenue.Precision
+    @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+    @objc override final public var hash: Swift.Int {
+      @objc get
     }
-    @_spi(Experimental) @objc deinit
-    @_spi(Experimental) final public func encode(to encoder: any Swift.Encoder) throws
-    @_spi(Experimental) public init(from decoder: any Swift.Decoder) throws
+    @objc deinit
+    final public func encode(to encoder: any Swift.Encoder) throws
+    public init(from decoder: any Swift.Decoder) throws
   }
 }
-@_spi(Internal) public enum AdRewardFailureReason : Swift.String, Swift.Codable, Swift.Sendable {
+@_spi(Internal) public enum AdRewardFailureReason : Swift.Codable, Swift.Hashable, Swift.Sendable {
   @_spi(Internal) case timeout
   @_spi(Internal) case networkError
-  @_spi(Internal) case backendError
+  @_spi(Internal) case backendError(reason: Swift.String?)
+  @_spi(Internal) case cancelled
   @_spi(Internal) case unknown
-  @_spi(Internal) public init?(rawValue: Swift.String)
-  @_spi(Internal) public typealias RawValue = Swift.String
   @_spi(Internal) public var rawValue: Swift.String {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+  @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
+  @_spi(Internal) public static func == (a: RevenueCat.AdRewardFailureReason, b: RevenueCat.AdRewardFailureReason) -> Swift.Bool
+  @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) public var hashValue: Swift.Int {
     @_spi(Internal) get
   }
 }
@@ -3108,14 +3094,24 @@ extension RevenueCat.PaywallData {
   @_spi(Internal) public let adUnitId: Swift.String
   @_spi(Internal) public let impressionId: Swift.String
   @_spi(Internal) public let rewardVerificationEnabled: Swift.Bool
-  @_spi(Internal) public let rewardItem: Swift.String?
-  @_spi(Internal) public let rewardAmount: Swift.Int?
-  @_spi(Internal) public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String, rewardVerificationEnabled: Swift.Bool, rewardItem: Swift.String?, rewardAmount: Swift.Int?)
+  @_spi(Internal) public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String, rewardVerificationEnabled: Swift.Bool)
   @_spi(Internal) public static func == (a: RevenueCat.AdRewardEarnedUnverified, b: RevenueCat.AdRewardEarnedUnverified) -> Swift.Bool
   @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
   @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
 }
-@_spi(Internal) public struct AdRewardVerified : Swift.Equatable, Swift.Sendable {
+@_spi(Internal) public struct AdRewardVerified : Swift.Codable, Swift.Equatable, Swift.Sendable {
+  @_spi(Internal) public let networkName: Swift.String?
+  @_spi(Internal) public let mediatorName: RevenueCat.MediatorName
+  @_spi(Internal) public let adFormat: RevenueCat.AdFormat
+  @_spi(Internal) public let placement: Swift.String?
+  @_spi(Internal) public let adUnitId: Swift.String
+  @_spi(Internal) public let impressionId: Swift.String
+  @_spi(Internal) public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
+  @_spi(Internal) public static func == (a: RevenueCat.AdRewardVerified, b: RevenueCat.AdRewardVerified) -> Swift.Bool
+  @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
+  @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+}
+@_spi(Internal) public struct AdRewardGranted : Swift.Equatable, Swift.Sendable {
   @_spi(Internal) public let networkName: Swift.String?
   @_spi(Internal) public let mediatorName: RevenueCat.MediatorName
   @_spi(Internal) public let adFormat: RevenueCat.AdFormat
@@ -3124,9 +3120,9 @@ extension RevenueCat.PaywallData {
   @_spi(Internal) public let impressionId: Swift.String
   @_spi(Internal) public let reward: RevenueCat.AdReward
   @_spi(Internal) public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String, reward: RevenueCat.AdReward)
-  @_spi(Internal) public static func == (a: RevenueCat.AdRewardVerified, b: RevenueCat.AdRewardVerified) -> Swift.Bool
+  @_spi(Internal) public static func == (a: RevenueCat.AdRewardGranted, b: RevenueCat.AdRewardGranted) -> Swift.Bool
 }
-@_spi(Internal) extension RevenueCat.AdRewardVerified : Swift.Codable {
+@_spi(Internal) extension RevenueCat.AdRewardGranted : Swift.Codable {
   @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
   @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
 }
@@ -3192,7 +3188,9 @@ extension RevenueCat.PaywallData {
       @_spi(Internal) public struct CustomURL : Swift.Codable, Swift.Sendable, Swift.Hashable, Swift.Equatable {
         @_spi(Internal) public let url: RevenueCat.PaywallComponent.LocalizationKey
         @_spi(Internal) public let packageParam: Swift.String?
-        @_spi(Internal) public init(url: RevenueCat.PaywallComponent.LocalizationKey, packageParam: Swift.String? = nil)
+        @_spi(Internal) public let appUserIDParam: Swift.String?
+        @_spi(Internal) public let envParam: Swift.String?
+        @_spi(Internal) public init(url: RevenueCat.PaywallComponent.LocalizationKey, packageParam: Swift.String? = nil, appUserIDParam: Swift.String? = nil, envParam: Swift.String? = nil)
         @_spi(Internal) public static func == (a: RevenueCat.PaywallComponent.PurchaseButtonComponent.CustomWebCheckout.CustomURL, b: RevenueCat.PaywallComponent.PurchaseButtonComponent.CustomWebCheckout.CustomURL) -> Swift.Bool
         @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
         @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
@@ -3256,6 +3254,7 @@ extension RevenueCat.PeriodType : Swift.Encodable {
       @_spi(Internal) case tryCheckRestore
       @_spi(Internal) case restorePurchases
       @_spi(Internal) case cancel
+      @_spi(Internal) case resubscribe
       @_spi(Internal) case billingCycle
       @_spi(Internal) case currentPrice
       @_spi(Internal) case expired
@@ -3355,6 +3354,7 @@ extension RevenueCat.PeriodType : Swift.Encodable {
       @_spi(Internal) case expiresOnDateWithoutChanges
       @_spi(Internal) case renewsOnDateForPrice
       @_spi(Internal) case renewsOnDate
+      @_spi(Internal) case renewsOnDateWithLastPaidPrice
       @_spi(Internal) case priceAfterwards
       @_spi(Internal) case freeTrialUntilDate
       @_spi(Internal) case priceExpiresOnDateWithoutChanges
@@ -3507,9 +3507,8 @@ extension RevenueCat.PeriodType : Swift.Encodable {
     @_spi(Internal) public let displayPurchaseHistoryLink: Swift.Bool
     @_spi(Internal) public let displayUserDetailsSection: Swift.Bool
     @_spi(Internal) public let displayVirtualCurrencies: Swift.Bool
-    @_spi(Internal) public let shouldWarnCustomersAboutMultipleSubscriptions: Swift.Bool
     @_spi(Internal) public let supportTickets: RevenueCat.CustomerCenterConfigData.Support.SupportTickets?
-    @_spi(Internal) public init(email: Swift.String, shouldWarnCustomerToUpdate: Swift.Bool, displayPurchaseHistoryLink: Swift.Bool, displayUserDetailsSection: Swift.Bool, displayVirtualCurrencies: Swift.Bool, shouldWarnCustomersAboutMultipleSubscriptions: Swift.Bool, supportTickets: RevenueCat.CustomerCenterConfigData.Support.SupportTickets? = nil)
+    @_spi(Internal) public init(email: Swift.String, shouldWarnCustomerToUpdate: Swift.Bool, displayPurchaseHistoryLink: Swift.Bool, displayUserDetailsSection: Swift.Bool, displayVirtualCurrencies: Swift.Bool, supportTickets: RevenueCat.CustomerCenterConfigData.Support.SupportTickets? = nil)
     @_spi(Internal) public struct SupportTickets : Swift.Equatable {
       @_spi(Internal) public let allowCreation: Swift.Bool
       @_spi(Internal) public let customerType: RevenueCat.CustomerCenterConfigData.Support.SupportTickets.CustomerType
@@ -3581,12 +3580,21 @@ extension RevenueCat.PeriodType : Swift.Encodable {
 }
 @_spi(Internal) extension RevenueCat.CustomerCenterConfigData.HelpPath.PathType : Swift.Sendable, Swift.Codable {
 }
-@_spi(Experimental) public struct RewardVerificationToken : Swift.Sendable, Swift.Equatable {
-  @_spi(Experimental) public let customData: Swift.String
-  @_spi(Experimental) public let clientTransactionID: Swift.String
-  @_spi(Experimental) public let appUserID: Swift.String
+public struct RewardVerificationToken : Swift.Sendable, Swift.Equatable {
+  public let customData: Swift.String
+  public let clientTransactionID: Swift.String
+  public let appUserID: Swift.String
   @_spi(Internal) public init(customData: Swift.String, clientTransactionID: Swift.String, appUserID: Swift.String)
-  @_spi(Experimental) public static func == (a: RevenueCat.RewardVerificationToken, b: RevenueCat.RewardVerificationToken) -> Swift.Bool
+  public static func == (a: RevenueCat.RewardVerificationToken, b: RevenueCat.RewardVerificationToken) -> Swift.Bool
+}
+public struct RewardedAdTrackingMetadata : Swift.Sendable {
+  public let networkName: Swift.String?
+  public let mediatorName: RevenueCat.MediatorName
+  public let adFormat: RevenueCat.AdFormat
+  public let placement: Swift.String?
+  public let adUnitId: Swift.String
+  public let impressionId: Swift.String
+  public init(networkName: Swift.String?, mediatorName: RevenueCat.MediatorName, adFormat: RevenueCat.AdFormat, placement: Swift.String?, adUnitId: Swift.String, impressionId: Swift.String)
 }
 extension RevenueCat.PurchasesReceiptParser {
   @objc public static let `default`: RevenueCat.PurchasesReceiptParser
@@ -3636,6 +3644,26 @@ extension Foundation.URL {
     get
   }
 }
+@_spi(Internal) @objc(RCPurchasesAuthenticationDelegate) public protocol AuthenticationDelegate : ObjectiveC.NSObjectProtocol {
+  @_spi(Internal) @objc func authenticatorDidEncounterError(_ error: RevenueCat.PublicError)
+  @_spi(Internal) @objc optional func authenticatorDidUpdateAccessToken(_ newAccessToken: Swift.String?)
+}
+@_spi(Internal) @_hasMissingDesignatedInitializers @objc(RCPurchasesAuthentication) final public class Authentication : ObjectiveC.NSObject {
+  @_spi(Internal) @objc weak final public var delegate: (any RevenueCat.AuthenticationDelegate)?
+  @_spi(Internal) @objc final public var currentAccessToken: Swift.String? {
+    @_spi(Internal) @objc get
+  }
+  @_spi(Internal) @available(*, deprecated, message: "The appUserID passed to logIn is a constant string known at compile time.\nThis is likely a programmer error. This ID is used to identify the current user.\nSee https://docs.revenuecat.com/docs/user-ids for more information.")
+  final public func identifyCurrentUser(as appUserID: Swift.StaticString, completion: @escaping (RevenueCat.CustomerInfo?, Swift.Bool, RevenueCat.PublicError?) -> Swift.Void)
+  @_spi(Internal) @_disfavoredOverload @objc(identifyCurrentUserAsID:completion:) final public func identifyCurrentUser(as appUserID: Swift.String, completion: @escaping (RevenueCat.CustomerInfo?, Swift.Bool, RevenueCat.PublicError?) -> Swift.Void)
+  @_spi(Internal) @objc(logInUsingToken:completion:) final public func logIn(using token: RevenueCat.Identity, completion: @escaping (RevenueCat.CustomerInfo?, RevenueCat.PublicError?) -> Swift.Void)
+  @_spi(Internal) @objc final public func logOut(completion: ((RevenueCat.CustomerInfo?, RevenueCat.PublicError?) -> Swift.Void)?)
+  @_spi(Internal) @available(*, deprecated, message: "The appUserID passed to logIn is a constant string known at compile time.\nThis is likely a programmer error. This ID is used to identify the current user.\nSee https://docs.revenuecat.com/docs/user-ids for more information.")
+  final public func identifyCurrentUser(as appUserID: Swift.StaticString) async throws -> (customerInfo: RevenueCat.CustomerInfo, created: Swift.Bool)
+  @_spi(Internal) @_disfavoredOverload final public func identifyCurrentUser(as appUserID: Swift.String) async throws -> (customerInfo: RevenueCat.CustomerInfo, created: Swift.Bool)
+  @_spi(Internal) final public func logOut() async throws -> RevenueCat.CustomerInfo
+  @_spi(Internal) @objc deinit
+}
 @_hasMissingDesignatedInitializers @objc(RCProductPaidPrice) final public class ProductPaidPrice : ObjectiveC.NSObject, Swift.Sendable {
   @objc final public let currency: Swift.String
   @objc final public let amount: Swift.Double
@@ -3643,6 +3671,15 @@ extension Foundation.URL {
   convenience public init(currency: Swift.String, amount: Swift.Double)
   convenience public init(currency: Swift.String, amount: Swift.Double, locale: Foundation.Locale = .current)
   @objc deinit
+}
+extension UIKit.UIApplication {
+  @_spi(Internal) @available(macCatalyst 13.1, *)
+  @available(macOS, unavailable)
+  @available(watchOS, unavailable)
+  @available(watchOSApplicationExtension, unavailable)
+  @_Concurrency.MainActor public var currentPresentationViewController: UIKit.UIViewController? {
+    @_spi(Internal) get
+  }
 }
 @_spi(Internal) public protocol EventsListener : AnyObject {
   @_spi(Internal) func onEventTracked(_ event: [Swift.String : Any])
@@ -3702,6 +3739,40 @@ extension Foundation.URL {
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
   }
 }
+@_spi(Internal) extension RevenueCat.PaywallComponent {
+  @_spi(Internal) final public class WebViewComponent : RevenueCat.PaywallComponentBase {
+    @_spi(Internal) public static let supportedProtocolVersion: Swift.Int
+    @_spi(Internal) final public let id: Swift.String
+    @_spi(Internal) final public let name: Swift.String?
+    @_spi(Internal) final public let visible: Swift.Bool?
+    @_spi(Internal) final public let protocolVersion: Swift.Int
+    @_spi(Internal) final public let url: Swift.String
+    @_spi(Internal) final public let size: RevenueCat.PaywallComponent.Size
+    @_spi(Internal) final public let overrides: RevenueCat.PaywallComponent.ComponentOverrides<RevenueCat.PaywallComponent.PartialWebViewComponent>?
+    @_spi(Internal) public static func validatedHTTPSURL(from urlString: Swift.String) -> Foundation.URL?
+    @_spi(Internal) public init(id: Swift.String, name: Swift.String? = nil, visible: Swift.Bool? = nil, protocolVersion: Swift.Int, url: Swift.String, size: RevenueCat.PaywallComponent.Size = .init(width: .fill, height: .fit(nil)), overrides: RevenueCat.PaywallComponent.ComponentOverrides<RevenueCat.PaywallComponent.PartialWebViewComponent>? = nil)
+    @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
+    @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.WebViewComponent, rhs: RevenueCat.PaywallComponent.WebViewComponent) -> Swift.Bool
+    @_spi(Internal) @objc deinit
+    @_spi(Internal) final public func encode(to encoder: any Swift.Encoder) throws
+    @_spi(Internal) final public var hashValue: Swift.Int {
+      @_spi(Internal) get
+    }
+    @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+  }
+  @_spi(Internal) final public class PartialWebViewComponent : RevenueCat.PaywallPartialComponent {
+    @_spi(Internal) final public let visible: Swift.Bool?
+    @_spi(Internal) public init(visible: Swift.Bool? = nil)
+    @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
+    @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.PartialWebViewComponent, rhs: RevenueCat.PaywallComponent.PartialWebViewComponent) -> Swift.Bool
+    @_spi(Internal) @objc deinit
+    @_spi(Internal) final public func encode(to encoder: any Swift.Encoder) throws
+    @_spi(Internal) final public var hashValue: Swift.Int {
+      @_spi(Internal) get
+    }
+    @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+  }
+}
 extension Swift.Error {
   @_spi(Internal) public var isOfferingWithoutWorkflowError: Swift.Bool {
     @_spi(Internal) get
@@ -3719,6 +3790,8 @@ extension RevenueCat.Store : Swift.Encodable {
     @objc public init(product: RevenueCat.StoreProduct)
     @objc public func with(promotionalOffer: RevenueCat.PromotionalOffer) -> Self
     @objc public func with(quantity: Swift.Int) -> Self
+    @available(iOS 17.0, macCatalyst 17.0, tvOS 17.0, visionOS 1.0, *)
+    public func with(confirmInScene: UIKit.UIScene) -> Self
     @available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
     @objc public func with(winBackOffer: RevenueCat.WinBackOffer) -> Self
     @available(iOS 15.0, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *)
@@ -3755,6 +3828,7 @@ extension RevenueCat.Store : Swift.Encodable {
 }
 @_spi(Internal) public struct WorkflowStep {
   @_spi(Internal) public let id: Swift.String
+  @_spi(Internal) public let type: Swift.String
   @_spi(Internal) public let screenId: Swift.String?
   @_spi(Internal) public var stepTriggers: [RevenueCat.WorkflowTrigger] {
     @_spi(Internal) get
@@ -3776,10 +3850,21 @@ extension RevenueCat.Store : Swift.Encodable {
   @_spi(Internal) public let assetBaseURL: Foundation.URL
   @_spi(Internal) public let componentsConfig: RevenueCat.PaywallComponentsData.ComponentsConfig
   @_spi(Internal) public let componentsLocalizations: [RevenueCat.PaywallComponent.LocaleID : RevenueCat.PaywallComponent.LocalizationDictionary]
-  @_spi(Internal) public let defaultLocale: RevenueCat.PaywallComponent.LocaleID
+  @_spi(Internal) public var defaultLocale: RevenueCat.PaywallComponent.LocaleID {
+    @_spi(Internal) get
+  }
   @_spi(Internal) public let offeringIdentifier: Swift.String?
   @_spi(Internal) public let exitOffers: RevenueCat.ExitOffers?
-  @_spi(Internal) public init(name: Swift.String?, templateName: Swift.String, revision: Swift.Int = 0, assetBaseURL: Foundation.URL, componentsConfig: RevenueCat.PaywallComponentsData.ComponentsConfig, componentsLocalizations: [RevenueCat.PaywallComponent.LocaleID : RevenueCat.PaywallComponent.LocalizationDictionary], defaultLocale: RevenueCat.PaywallComponent.LocaleID, offeringIdentifier: Swift.String?, exitOffers: RevenueCat.ExitOffers? = nil)
+  @_spi(Internal) public var automaticallyScaleFontSize: Swift.Bool {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public var stateDeclarations: [Swift.String : RevenueCat.PaywallComponent.StateDeclaration]? {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public var zeroDecimalPlaceCountries: [Swift.String] {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public init(name: Swift.String?, templateName: Swift.String, revision: Swift.Int = 0, assetBaseURL: Foundation.URL, componentsConfig: RevenueCat.PaywallComponentsData.ComponentsConfig, componentsLocalizations: [RevenueCat.PaywallComponent.LocaleID : RevenueCat.PaywallComponent.LocalizationDictionary], defaultLocale: RevenueCat.PaywallComponent.LocaleID, offeringIdentifier: Swift.String?, exitOffers: RevenueCat.ExitOffers? = nil, automaticallyScaleFontSize: Swift.Bool = true, stateDeclarations: [Swift.String : RevenueCat.PaywallComponent.StateDeclaration]? = nil, zeroDecimalPlaceCountries: [Swift.String] = [])
 }
 @_spi(Internal) public struct PublishedWorkflow {
   @_spi(Internal) public let id: Swift.String
@@ -3796,6 +3881,7 @@ extension RevenueCat.Store : Swift.Encodable {
 }
 @_spi(Internal) public enum WorkflowError : Swift.Error, Swift.Equatable, Swift.Sendable {
   @_spi(Internal) case uiConfigUnavailable(workflowId: Swift.String)
+  @_spi(Internal) case configurationUnavailable(workflowId: Swift.String)
   @_spi(Internal) public static func == (a: RevenueCat.WorkflowError, b: RevenueCat.WorkflowError) -> Swift.Bool
 }
 @_spi(Internal) extension RevenueCat.WorkflowTrigger : Swift.Codable, Swift.Equatable, Swift.Sendable {
@@ -4017,6 +4103,30 @@ extension RevenueCat.Store : Swift.Encodable {
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
   }
 }
+@_spi(Internal) @_hasMissingDesignatedInitializers @objc(RCIdentity) final public class Identity : ObjectiveC.NSObject {
+  @_spi(Internal) @objc(identityWithSignInWithAppleToken:) public static func signInWithApple(_ identityToken: Foundation.Data) -> RevenueCat.Identity
+  @_spi(Internal) @objc(identityWithOIDCToken:) public static func oidc(_ identityToken: Foundation.Data) -> RevenueCat.Identity
+  @_spi(Internal) @objc(identityWithFirebaseToken:) public static func firebase(_ identityToken: Foundation.Data) -> RevenueCat.Identity
+  @_spi(Internal) @objc final public var identitySource: RevenueCat.IdentitySource {
+    @_spi(Internal) @objc get
+  }
+  @_spi(Internal) @objc deinit
+}
+@_spi(Internal) @_hasMissingDesignatedInitializers @objc(RCIdentitySource) final public class IdentitySource : ObjectiveC.NSObject, Swift.CaseIterable {
+  @_spi(Internal) public static let allCases: [RevenueCat.IdentitySource]
+  @_spi(Internal) @objc public static let anonymous: RevenueCat.IdentitySource
+  @_spi(Internal) @objc public static let oidc: RevenueCat.IdentitySource
+  @_spi(Internal) @objc public static let google: RevenueCat.IdentitySource
+  @_spi(Internal) @objc public static let signInWithApple: RevenueCat.IdentitySource
+  @_spi(Internal) @objc public static let facebook: RevenueCat.IdentitySource
+  @_spi(Internal) @objc public static let firebase: RevenueCat.IdentitySource
+  @_spi(Internal) @objc final public let rawValue: Swift.String
+  @_spi(Internal) @objc override final public var description: Swift.String {
+    @_spi(Internal) @objc get
+  }
+  @_spi(Internal) public typealias AllCases = [RevenueCat.IdentitySource]
+  @_spi(Internal) @objc deinit
+}
 @objc(RCEntitlementInfos) final public class EntitlementInfos : ObjectiveC.NSObject {
   @objc final public let all: [Swift.String : RevenueCat.EntitlementInfo]
   @objc final public subscript(key: Swift.String) -> RevenueCat.EntitlementInfo? {
@@ -4044,6 +4154,37 @@ extension RevenueCat.EntitlementInfos {
   }
 }
 extension RevenueCat.EntitlementInfos : Swift.Sendable {
+}
+@_spi(Internal) @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public actor WebBundleEventBus {
+  @_spi(Internal) public static let shared: RevenueCat.WebBundleEventBus
+  @_spi(Internal) nonisolated final public let publisher: Combine.AnyPublisher<RevenueCat.WebBundleEvent, Swift.Never>
+  @_spi(Internal) public init()
+  @_spi(Internal) public func publish(_ urls: [RevenueCat.URLWithValidation])
+  @_spi(Internal) public func empty()
+  @_spi(Internal) public func clearCache()
+  @_spi(Internal) @objc deinit
+  @_spi(Internal) @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+  @_semantics("defaultActor") nonisolated final public var unownedExecutor: _Concurrency.UnownedSerialExecutor {
+    @_spi(Internal) get
+  }
+}
+@_spi(Internal) public enum WebBundleEvent : Swift.Equatable, Swift.Sendable {
+  @_spi(Internal) case empty
+  @_spi(Internal) case receivedAssetURLs([RevenueCat.URLWithValidation])
+  @_spi(Internal) case cacheClearRequested
+  @_spi(Internal) public static func == (a: RevenueCat.WebBundleEvent, b: RevenueCat.WebBundleEvent) -> Swift.Bool
+}
+@_spi(Internal) final public class WebViewDataStoreIdentifierStore {
+  @_spi(Internal) public static let shared: RevenueCat.WebViewDataStoreIdentifierStore
+  @_spi(Internal) convenience public init()
+  @_spi(Internal) public init(userDefaults: Foundation.UserDefaults)
+  @_spi(Internal) final public func identifier() -> Foundation.UUID
+  @_spi(Internal) @discardableResult
+  final public func retireCurrentIdentifier() -> Foundation.UUID?
+  @_spi(Internal) final public func pendingRemovalIdentifiers() -> Swift.Set<Foundation.UUID>
+  @_spi(Internal) final public func removeFromPending(_ identifiers: Swift.Set<Foundation.UUID>)
+  @_spi(Internal) @objc deinit
 }
 @objc(RCCustomPaywallImpressionParams) final public class CustomPaywallImpressionParams : ObjectiveC.NSObject, Swift.Sendable {
   @objc final public let paywallId: Swift.String?
@@ -4258,7 +4399,8 @@ extension RevenueCat.PresentedOfferingContext.TargetingContext : Swift.Sendable 
     @objc public func with(diagnosticsEnabled: Swift.Bool) -> RevenueCat.Configuration.Builder
     @objc public func with(storeKitVersion version: RevenueCat.StoreKitVersion) -> RevenueCat.Configuration.Builder
     @objc public func with(automaticDeviceIdentifierCollectionEnabled: Swift.Bool) -> RevenueCat.Configuration.Builder
-    @_spi(Experimental) @objc(withIAMEnabled:) public func with(iamEnabled: Swift.Bool) -> RevenueCat.Configuration.Builder
+    @_spi(Internal) @objc(withIAMEnabled:) public func with(iamEnabled: Swift.Bool) -> RevenueCat.Configuration.Builder
+    @_spi(Internal) @objc(withIAMEnabled:keychainAccessGroup:) public func with(iamEnabled: Swift.Bool, keychainAccessGroup: Swift.String) -> RevenueCat.Configuration.Builder
     @objc public func build() -> RevenueCat.Configuration
     @objc public func with(preferredUILocaleOverride: Swift.String?) -> RevenueCat.Configuration.Builder
     @objc deinit
@@ -4761,6 +4903,18 @@ extension RevenueCat.PaywallColor : Swift.Codable {
       @_spi(Internal) get
     }
   }
+  @_spi(Internal) public enum ComparisonOperator : Swift.String, Swift.Codable, Swift.Sendable, Swift.Hashable, Swift.Equatable {
+    @_spi(Internal) case greaterThanOrEqual
+    @_spi(Internal) case greaterThan
+    @_spi(Internal) case lessThanOrEqual
+    @_spi(Internal) case lessThan
+    @_spi(Internal) case equal
+    @_spi(Internal) public init?(rawValue: Swift.String)
+    @_spi(Internal) public typealias RawValue = Swift.String
+    @_spi(Internal) public var rawValue: Swift.String {
+      @_spi(Internal) get
+    }
+  }
   @_spi(Internal) public enum ExtendedCondition : Swift.Codable, Swift.Sendable, Swift.Hashable, Swift.Equatable {
     @_spi(Internal) case compact
     @_spi(Internal) case medium
@@ -4774,6 +4928,9 @@ extension RevenueCat.PaywallColor : Swift.Codable {
     @_spi(Internal) case variable(operator: RevenueCat.PaywallComponent.EqualityOperator, variable: Swift.String, value: RevenueCat.PaywallComponent.ConditionValue)
     @_spi(Internal) case selectedPackage(operator: RevenueCat.PaywallComponent.ArrayOperator, packages: [Swift.String])
     @_spi(Internal) case state(operator: RevenueCat.PaywallComponent.EqualityOperator, name: Swift.String, value: RevenueCat.PaywallComponent.ConditionValue)
+    @_spi(Internal) case windowWidth(operator: RevenueCat.PaywallComponent.ComparisonOperator, value: Swift.Double)
+    @_spi(Internal) case windowHeight(operator: RevenueCat.PaywallComponent.ComparisonOperator, value: Swift.Double)
+    @_spi(Internal) case windowAspectRatio(operator: RevenueCat.PaywallComponent.ComparisonOperator, value: Swift.Double)
     @_spi(Internal) case unsupported
     @_spi(Internal) public var isRule: Swift.Bool {
       @_spi(Internal) get
@@ -4990,10 +5147,16 @@ extension RevenueCat.PaywallColor : Swift.Codable {
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
   }
   @_spi(Internal) public enum SizeConstraint : Swift.Codable, Swift.Sendable, Swift.Hashable {
-    @_spi(Internal) case fit(Swift.UInt?)
-    @_spi(Internal) case fill
+    @_spi(Internal) case fit(Swift.UInt?, _: RevenueCat.MinMax = .null)
+    @_spi(Internal) case fill(RevenueCat.MinMax)
     @_spi(Internal) case fixed(Swift.UInt)
-    @_spi(Internal) case relative(Swift.Double)
+    @_spi(Internal) case relative(Swift.Double, _: RevenueCat.MinMax = .null)
+    @_spi(Internal) public static var fill: RevenueCat.PaywallComponent.SizeConstraint {
+      @_spi(Internal) get
+    }
+    @_spi(Internal) public var isFill: Swift.Bool {
+      @_spi(Internal) get
+    }
     @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
     @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.SizeConstraint, rhs: RevenueCat.PaywallComponent.SizeConstraint) -> Swift.Bool
@@ -5140,6 +5303,19 @@ extension RevenueCat.PaywallColor : Swift.Codable {
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
   }
 }
+@_spi(Internal) public struct MinMax : Swift.Codable, Swift.Hashable, Swift.Sendable {
+  @_spi(Internal) public let min: Swift.UInt?
+  @_spi(Internal) public let max: Swift.UInt?
+  @_spi(Internal) public init(min: Swift.UInt?, max: Swift.UInt?)
+  @_spi(Internal) public static let null: RevenueCat.MinMax
+  @_spi(Internal) public static func == (a: RevenueCat.MinMax, b: RevenueCat.MinMax) -> Swift.Bool
+  @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
+  @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) public var hashValue: Swift.Int {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+}
 @_spi(Internal) extension Swift.Dictionary where Key == Swift.String, Value == RevenueCat.PaywallComponentsData.LocalizationData {
   @_spi(Internal) public func string(key: Swift.String) throws -> Swift.String
   @_spi(Internal) public func image(key: Swift.String) throws -> RevenueCat.PaywallComponent.ThemeImageUrls
@@ -5194,6 +5370,7 @@ extension RevenueCat.PaywallColor : Swift.Codable {
   @_spi(Internal) case carousel(RevenueCat.PaywallComponent.CarouselComponent)
   @_spi(Internal) case video(RevenueCat.PaywallComponent.VideoComponent)
   @_spi(Internal) case countdown(RevenueCat.PaywallComponent.CountdownComponent)
+  @_spi(Internal) case webView(RevenueCat.PaywallComponent.WebViewComponent)
   @_spi(Internal) case fallbackHeader
   @_spi(Internal) public enum ComponentType : Swift.String, Swift.Codable, Swift.Sendable {
     @_spi(Internal) case text
@@ -5212,6 +5389,7 @@ extension RevenueCat.PaywallColor : Swift.Codable {
     @_spi(Internal) case carousel
     @_spi(Internal) case video
     @_spi(Internal) case countdown
+    @_spi(Internal) case webView
     @_spi(Internal) case fallbackHeader
     @_spi(Internal) public init?(rawValue: Swift.String)
     @_spi(Internal) public typealias RawValue = Swift.String
@@ -5318,7 +5496,8 @@ extension RevenueCat.AttributionNetwork : Swift.Encodable {
   @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
 }
 @_spi(Internal) extension RevenueCat.PaywallComponentsData {
-  @_spi(Internal) public struct EquatableError : Swift.Equatable, Swift.Sendable {
+  @_spi(Internal) public struct EquatableError : Swift.Equatable, Swift.Sendable, Swift.CustomStringConvertible {
+    @_spi(Internal) public let description: Swift.String
     @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponentsData.EquatableError, rhs: RevenueCat.PaywallComponentsData.EquatableError) -> Swift.Bool
   }
 }
@@ -5413,6 +5592,7 @@ extension Foundation.NSError {
   func syncAttributesAndOfferingsIfNeeded() async throws -> RevenueCat.Offerings?
   @objc func redeemWebPurchase(webPurchaseRedemption: RevenueCat.WebPurchaseRedemption, completion: @escaping (RevenueCat.CustomerInfo?, RevenueCat.PublicError?) -> Swift.Void)
   @objc func getVirtualCurrencies(completion: @escaping @Sendable (RevenueCat.VirtualCurrencies?, RevenueCat.PublicError?) -> Swift.Void)
+  @_spi(Internal) @objc func spendVirtualCurrencies(amounts: [Swift.String : Swift.Int], reference: Swift.String?, completion: @escaping (RevenueCat.VirtualCurrencies?, RevenueCat.PublicError?) -> Swift.Void)
   @objc var cachedVirtualCurrencies: RevenueCat.VirtualCurrencies? { get }
   @objc func invalidateVirtualCurrenciesCache()
   @objc func setAttributes(_ attributes: [Swift.String : Swift.String])
@@ -5595,16 +5775,16 @@ extension RevenueCat.StoreKitVersion : Swift.CustomDebugStringConvertible {
     @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
   }
 }
-@_spi(Experimental) public struct RewardVerificationResult : Swift.Sendable, Swift.Equatable {
+public struct RewardVerificationResult : Swift.Sendable, Swift.Equatable {
   @_spi(Internal) public static func verified(_ reward: RevenueCat.AdReward, moreRewards: [RevenueCat.AdReward] = []) -> RevenueCat.RewardVerificationResult
-  @_spi(Experimental) public static let failed: RevenueCat.RewardVerificationResult
-  @_spi(Experimental) public var verifiedReward: RevenueCat.AdReward? {
-    @_spi(Experimental) get
+  public static let failed: RevenueCat.RewardVerificationResult
+  public var verifiedReward: RevenueCat.AdReward? {
+    get
   }
-  @_spi(Experimental) public var moreRewards: [RevenueCat.AdReward] {
-    @_spi(Experimental) get
+  public var moreRewards: [RevenueCat.AdReward] {
+    get
   }
-  @_spi(Experimental) public static func == (a: RevenueCat.RewardVerificationResult, b: RevenueCat.RewardVerificationResult) -> Swift.Bool
+  public static func == (a: RevenueCat.RewardVerificationResult, b: RevenueCat.RewardVerificationResult) -> Swift.Bool
 }
 @_spi(Internal) extension RevenueCat.PaywallComponent {
   @_spi(Internal) public struct Animation : RevenueCat.PaywallComponentBase {
@@ -5632,22 +5812,30 @@ extension RevenueCat.StoreKitVersion : Swift.CustomDebugStringConvertible {
     }
   }
 }
-@_spi(Experimental) @_hasMissingDesignatedInitializers @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
-@objc(RCAdTracker) final public class AdTracker : ObjectiveC.NSObject {
-  @_spi(Experimental) @objc final public func trackAdFailedToLoad(_ data: RevenueCat.AdFailedToLoad)
+@_spi(Internal) public enum ExternalPurchaseLinkResult {
+  @_spi(Internal) case proceed(externalPurchaseTokenID: Swift.String?)
+  @_spi(Internal) case stopped
+}
+@_spi(Internal) extension RevenueCat.ExternalPurchaseLinkResult : Swift.Equatable, Swift.Sendable {
+  @_spi(Internal) public static func == (a: RevenueCat.ExternalPurchaseLinkResult, b: RevenueCat.ExternalPurchaseLinkResult) -> Swift.Bool
+}
+@objc @_hasMissingDesignatedInitializers @available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *)
+final public class AdTracker : ObjectiveC.NSObject {
+  final public func trackAdFailedToLoad(_ data: RevenueCat.AdFailedToLoad)
   @_spi(Internal) final public func trackAdFailedToLoad(_ data: RevenueCat.AdFailedToLoad, captureMethod: RevenueCat.AdEventCaptureMethod)
-  @_spi(Experimental) @objc final public func trackAdLoaded(_ data: RevenueCat.AdLoaded)
+  final public func trackAdLoaded(_ data: RevenueCat.AdLoaded)
   @_spi(Internal) final public func trackAdLoaded(_ data: RevenueCat.AdLoaded, captureMethod: RevenueCat.AdEventCaptureMethod)
-  @_spi(Experimental) @objc final public func trackAdDisplayed(_ data: RevenueCat.AdDisplayed)
+  final public func trackAdDisplayed(_ data: RevenueCat.AdDisplayed)
   @_spi(Internal) final public func trackAdDisplayed(_ data: RevenueCat.AdDisplayed, captureMethod: RevenueCat.AdEventCaptureMethod)
-  @_spi(Experimental) @objc final public func trackAdOpened(_ data: RevenueCat.AdOpened)
+  final public func trackAdOpened(_ data: RevenueCat.AdOpened)
   @_spi(Internal) final public func trackAdOpened(_ data: RevenueCat.AdOpened, captureMethod: RevenueCat.AdEventCaptureMethod)
-  @_spi(Experimental) @objc final public func trackAdRevenue(_ data: RevenueCat.AdRevenue)
+  final public func trackAdRevenue(_ data: RevenueCat.AdRevenue)
   @_spi(Internal) final public func trackAdRevenue(_ data: RevenueCat.AdRevenue, captureMethod: RevenueCat.AdEventCaptureMethod)
   @_spi(Internal) final public func trackAdRewardEarnedUnverified(_ data: RevenueCat.AdRewardEarnedUnverified, captureMethod: RevenueCat.AdEventCaptureMethod)
   @_spi(Internal) final public func trackAdRewardVerified(_ data: RevenueCat.AdRewardVerified, captureMethod: RevenueCat.AdEventCaptureMethod)
   @_spi(Internal) final public func trackAdRewardFailedToVerify(_ data: RevenueCat.AdRewardFailedToVerify, captureMethod: RevenueCat.AdEventCaptureMethod)
-  @_spi(Experimental) @objc deinit
+  @_spi(Internal) final public func trackAdRewardGranted(_ data: RevenueCat.AdRewardGranted, captureMethod: RevenueCat.AdEventCaptureMethod)
+  @objc deinit
 }
 public typealias SK1Product = StoreKit.SKProduct
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
@@ -5782,7 +5970,8 @@ extension RevenueCat.StoreProduct {
     @_spi(Internal) final public let tabId: Swift.String
     @_spi(Internal) final public let name: Swift.String?
     @_spi(Internal) final public let stack: RevenueCat.PaywallComponent.StackComponent
-    @_spi(Internal) public init(tabId: Swift.String, stack: RevenueCat.PaywallComponent.StackComponent, name: Swift.String? = nil)
+    @_spi(Internal) final public let hapticFeedbackEnabled: Swift.Bool?
+    @_spi(Internal) public init(tabId: Swift.String, stack: RevenueCat.PaywallComponent.StackComponent, name: Swift.String? = nil, hapticFeedbackEnabled: Swift.Bool? = nil)
     @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
     @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.TabControlButtonComponent, rhs: RevenueCat.PaywallComponent.TabControlButtonComponent) -> Swift.Bool
     @_spi(Internal) @objc deinit
@@ -5798,7 +5987,8 @@ extension RevenueCat.StoreProduct {
     @_spi(Internal) final public let thumbColorOff: RevenueCat.PaywallComponent.ColorScheme
     @_spi(Internal) final public let trackColorOn: RevenueCat.PaywallComponent.ColorScheme
     @_spi(Internal) final public let trackColorOff: RevenueCat.PaywallComponent.ColorScheme
-    @_spi(Internal) public init(defaultValue: Swift.Bool, name: Swift.String? = nil, thumbColorOn: RevenueCat.PaywallComponent.ColorScheme, thumbColorOff: RevenueCat.PaywallComponent.ColorScheme, trackColorOn: RevenueCat.PaywallComponent.ColorScheme, trackColorOff: RevenueCat.PaywallComponent.ColorScheme)
+    @_spi(Internal) final public let hapticFeedbackEnabled: Swift.Bool?
+    @_spi(Internal) public init(defaultValue: Swift.Bool, name: Swift.String? = nil, thumbColorOn: RevenueCat.PaywallComponent.ColorScheme, thumbColorOff: RevenueCat.PaywallComponent.ColorScheme, trackColorOn: RevenueCat.PaywallComponent.ColorScheme, trackColorOff: RevenueCat.PaywallComponent.ColorScheme, hapticFeedbackEnabled: Swift.Bool? = nil)
     @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
     @_spi(Internal) public static func == (lhs: RevenueCat.PaywallComponent.TabControlToggleComponent, rhs: RevenueCat.PaywallComponent.TabControlToggleComponent) -> Swift.Bool
     @_spi(Internal) @objc deinit
@@ -5902,6 +6092,9 @@ extension RevenueCat.StoreProduct {
 }
 extension Foundation.NotificationCenter {
   @_spi(Internal) public func purchaseCompletedPublisher() -> Combine.AnyPublisher<RevenueCat.PurchaseResultData, Swift.Never>
+}
+@_spi(Internal) @objc public protocol PurchasesPostConfigurationStep : ObjectiveC.NSObjectProtocol {
+  @_spi(Internal) @objc static func purchasesDidConfigure()
 }
 extension StoreKit.SKRequest : @unchecked @retroactive Swift.Sendable {
 }
@@ -6122,6 +6315,79 @@ public struct ExitOffers : Swift.Codable, Swift.Sendable, Swift.Hashable, Swift.
   public typealias RawValue = Swift.String
   @objc deinit
 }
+@_spi(Internal) public enum CheckpointValue : Swift.Equatable, Swift.Hashable, Swift.Sendable {
+  @_spi(Internal) case string(Swift.String)
+  @_spi(Internal) case double(Swift.Double)
+  @_spi(Internal) case boolean(Swift.Bool)
+  @_spi(Internal) public static func == (a: RevenueCat.CheckpointValue, b: RevenueCat.CheckpointValue) -> Swift.Bool
+  @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) public var hashValue: Swift.Int {
+    @_spi(Internal) get
+  }
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue : Swift.ExpressibleByStringLiteral {
+  @_spi(Internal) public init(stringLiteral value: Swift.String)
+  @_spi(Internal) public typealias ExtendedGraphemeClusterLiteralType = Swift.String
+  @_spi(Internal) public typealias StringLiteralType = Swift.String
+  @_spi(Internal) public typealias UnicodeScalarLiteralType = Swift.String
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue : Swift.ExpressibleByIntegerLiteral {
+  @_spi(Internal) public init(integerLiteral value: Swift.Int64)
+  @_spi(Internal) public typealias IntegerLiteralType = Swift.Int64
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue : Swift.ExpressibleByFloatLiteral {
+  @_spi(Internal) public init(floatLiteral value: Swift.Double)
+  @_spi(Internal) public typealias FloatLiteralType = Swift.Double
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue : Swift.ExpressibleByBooleanLiteral {
+  @_spi(Internal) public init(booleanLiteral value: Swift.Bool)
+  @_spi(Internal) public typealias BooleanLiteralType = Swift.Bool
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue : Swift.Codable {
+  @_spi(Internal) public init(from decoder: any Swift.Decoder) throws
+  @_spi(Internal) public func encode(to encoder: any Swift.Encoder) throws
+}
+@_spi(Internal) extension RevenueCat.CheckpointValue {
+  @_spi(Internal) public init?(foundationValue: Any)
+  @_spi(Internal) public var foundationValue: Any {
+    @_spi(Internal) get
+  }
+}
+@_spi(Internal) final public class CheckpointParams : Swift.Equatable, Swift.Hashable, Swift.CustomStringConvertible, @unchecked Swift.Sendable {
+  @_spi(Internal) final public let customVariables: [Swift.String : RevenueCat.CheckpointValue]
+  @_spi(Internal) public init(customVariables: [Swift.String : RevenueCat.CheckpointValue] = [:])
+  @_spi(Internal) public static func == (lhs: RevenueCat.CheckpointParams, rhs: RevenueCat.CheckpointParams) -> Swift.Bool
+  @_spi(Internal) final public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) final public var description: Swift.String {
+    @_spi(Internal) get
+  }
+  @_spi(Internal) @objc deinit
+  @_spi(Internal) final public var hashValue: Swift.Int {
+    @_spi(Internal) get
+  }
+}
+@_spi(Internal) public enum CheckpointResolution {
+  @_spi(Internal) case matchedWorkflow(RevenueCat.ResolvedCheckpointWorkflow)
+  @_spi(Internal) case matchedOffering(RevenueCat.Offering)
+  @_spi(Internal) case noAction(RevenueCat.CheckpointResolutionReason)
+}
+@_spi(Internal) public enum CheckpointResolutionReason : Swift.Sendable {
+  @_spi(Internal) case noMatch
+  @_spi(Internal) case configurationUnavailable
+  @_spi(Internal) case unknownCheckpoint
+  @_spi(Internal) public static func == (a: RevenueCat.CheckpointResolutionReason, b: RevenueCat.CheckpointResolutionReason) -> Swift.Bool
+  @_spi(Internal) public func hash(into hasher: inout Swift.Hasher)
+  @_spi(Internal) public var hashValue: Swift.Int {
+    @_spi(Internal) get
+  }
+}
+@_spi(Internal) @_hasMissingDesignatedInitializers final public class ResolvedCheckpointWorkflow : @unchecked Swift.Sendable {
+  @_spi(Internal) final public let workflow: RevenueCat.PublishedWorkflow
+  @_spi(Internal) final public let uiConfig: RevenueCat.UIConfig
+  @_spi(Internal) final public let offering: RevenueCat.Offering
+  @_spi(Internal) final public let offerings: RevenueCat.Offerings
+  @_spi(Internal) @objc deinit
+}
 extension RevenueCat.VerificationResult : Swift.Equatable {}
 extension RevenueCat.VerificationResult : Swift.Hashable {}
 extension RevenueCat.VerificationResult : Swift.RawRepresentable {}
@@ -6185,9 +6451,6 @@ extension RevenueCat.TestStoreProduct : Swift.Sendable {}
 @_spi(Internal) extension RevenueCat.AdEventCaptureMethod : Swift.Equatable {}
 @_spi(Internal) extension RevenueCat.AdEventCaptureMethod : Swift.Hashable {}
 @_spi(Internal) extension RevenueCat.AdEventCaptureMethod : Swift.RawRepresentable {}
-@_spi(Internal) extension RevenueCat.AdRewardFailureReason : Swift.Equatable {}
-@_spi(Internal) extension RevenueCat.AdRewardFailureReason : Swift.Hashable {}
-@_spi(Internal) extension RevenueCat.AdRewardFailureReason : Swift.RawRepresentable {}
 extension RevenueCat.StoreProductDiscount.DiscountType : Swift.Equatable {}
 extension RevenueCat.StoreProductDiscount.DiscountType : Swift.Hashable {}
 extension RevenueCat.StoreProductDiscount.DiscountType : Swift.RawRepresentable {}
@@ -6233,6 +6496,7 @@ extension RevenueCat.PaywallColor.ColorScheme : Swift.BitwiseCopyable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.Condition : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.EqualityOperator : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.ArrayOperator : Swift.RawRepresentable {}
+@_spi(Internal) extension RevenueCat.PaywallComponent.ComparisonOperator : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.FlexDistribution : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.HorizontalAlignment : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.VerticalAlignment : Swift.RawRepresentable {}
@@ -6254,3 +6518,5 @@ extension RevenueCat.StoreKitVersion : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.CarouselComponent.AutoAdvanceTransitionType : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.CarouselComponent.PageControl.Position : Swift.RawRepresentable {}
 @_spi(Internal) extension RevenueCat.PaywallComponent.CountdownComponent.CountFrom : Swift.RawRepresentable {}
+@_spi(Internal) extension RevenueCat.CheckpointResolutionReason : Swift.Equatable {}
+@_spi(Internal) extension RevenueCat.CheckpointResolutionReason : Swift.Hashable {}
