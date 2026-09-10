@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Tonestro.Maui.RevenueCat.iOS.Extensions</PackageId>
     <Description>Contains convenience methods and async extensions for Tonestro.Maui.RevenueCat.iOS</Description>
-    <Version>5.81.1.1</Version>
+    <Version>5.89.0.1</Version>
     <Authors>Christian Kapplmüller, Albilaga Linggra Pradana</Authors>
     <Company>fun.music IT GmbH</Company>
     <PackageOutputPath>nugetoutput</PackageOutputPath>

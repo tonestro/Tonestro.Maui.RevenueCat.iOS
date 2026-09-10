@@ -1,4 +1,5 @@
 using RevenueCat;
+using ObjCRuntime;
 using Tonestro.Maui.RevenueCat.iOS.Extensions;
 
 namespace Tonestro.Maui.RevenueCat.iOS.UsageChecker;
@@ -43,6 +44,17 @@ public class AppDelegate : UIApplicationDelegate
     {
         AppendLine("== RevenueCat binding runtime check ==");
         AppendLine($"FrameworkVersion:        {RCPurchases.FrameworkVersion}");
+        Check(RCPurchases.FrameworkVersion == "5.89.0", "Native SDK is 5.89.0");
+
+        using var defaultSettings = new RCDangerousSettings();
+        Check(!defaultSettings.ForceAllowTestStoreInReleaseBuilds, "Test Store override defaults to false");
+        using var testStoreSettings = RCDangerousSettings.CreateWithTestStore(false, true);
+        Check(!testStoreSettings.AutoSyncPurchases && testStoreSettings.ForceAllowTestStoreInReleaseBuilds,
+            "Test Store settings factory");
+        using var legacySettings = new RCDangerousSettings(false, true);
+        Check(legacySettings.CustomEntitlementComputation && !legacySettings.ForceAllowTestStoreInReleaseBuilds,
+            "Existing settings constructor retains its meaning");
+        Check(RCIdentitySource.Anonymous.RawValue == "anonymous", "Identity source marshaling");
 
         RCPurchases.LogLevel = RCLogLevel.Debug;
         AppendLine($"LogLevel:                {RCPurchases.LogLevel}");
@@ -50,6 +62,7 @@ public class AppDelegate : UIApplicationDelegate
 
         var builder = RCConfiguration.BuilderWithAPIKey("appl_fakeApiKeyForBindingCheck")
             .WithAppUserID("binding-check-user")
+            .WithIAMEnabled(false, "binding-check-keychain-group")
             .WithPurchasesAreCompletedBy(RCPurchasesAreCompletedBy.RevenueCat, RCStoreKitVersion.StoreKit2);
         var purchases = RCPurchases.ConfigureWithConfiguration(builder.Build());
 
@@ -61,12 +74,27 @@ public class AppDelegate : UIApplicationDelegate
         AppendLine($"PurchasesAreCompletedBy: {purchases.PurchasesAreCompletedBy}");
         AppendLine($"PackageType roundtrip:   Annual -> \"{RCPackage.StringFrom(RCPackageType.Annual)}\"");
 
+        Check(purchases.RespondsToSelector(new Selector("spendVirtualCurrenciesWithAmounts:reference:completion:")),
+            "Virtual currency spending selector");
+        Check(purchases.Authentication.RespondsToSelector(new Selector("logInUsingToken:completion:")),
+            "Authentication login selector");
+        Check(purchases.Attribution.RespondsToSelector(new Selector("setSingularDeviceID:")),
+            "Singular attribution selector");
+
         purchases.GetStorefront(storefront => InvokeOnMainThread(() =>
             AppendLine(storefront is null
                 ? "Storefront:              (null)"
                 : $"Storefront:              {storefront.CountryCode} (id {storefront.Identifier})")));
 
         _ = ChecksAsync(purchases);
+    }
+
+    private void Check(bool condition, string description)
+    {
+        if (!condition)
+            throw new InvalidOperationException($"Binding check failed: {description}");
+
+        AppendLine($"PASS: {description}");
     }
 
     private async Task ChecksAsync(RCPurchases purchases)
